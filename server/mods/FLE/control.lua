@@ -1,29 +1,29 @@
 -- A docker image with the Factorio headless server which has a mod with different scenarios. The mod exposes LUA functions for all the actions available in the game including extracting stats.
 -- An application makes it easy to configure and spin up the docker image for a specific scenario and with a specific amount of agents. It includes a thin RCON wrapper mapping to the exposed LUA functions, so it is easy to work with. 
 
+local function destroy_all_characters(surface)
+  game.print("Destroying all characters on surface: " .. surface.name)
+  for _, entity in pairs(surface.find_entities_filtered{type = "character"}) do
+    game.print("Destroying character: " .. entity.name .. " at position: " .. serpent.line(entity.position))
+    if entity.valid then
+      entity.destroy()
+    end
+  end
+end
 
 script.on_init(function()
-  global.initial_tiles    = {}
-  global.initial_entities = {}
+  global.game_surface = game.surfaces["nauvis"]
+  global.backup = game.create_surface("scenario_backup")
 
-  local surface = game.surfaces["nauvis"]  -- or your scenario surface
-  surface.show_clouds = false
-  surface.always_day = true
+  global.game_surface.clone_area{
+    source_area      = {{-1000,-1000},{1000,1000}},
+    destination_area = {{-1000,-1000},{1000,1000}},
+    destination_surface = global.backup,
+    clone_tiles      = true,
+    clone_entities   = true
+  }
 
-  -- Capture all tiles
-  for _, tile in pairs(surface.find_tiles_filtered{}) do
-    table.insert(global.initial_tiles, {name = tile.name, position = tile.position})
-  end
-
-  -- Capture all entities
-  for _, ent in pairs(surface.find_entities{}) do
-    table.insert(global.initial_entities, {
-      name      = ent.name,
-      position  = ent.position,
-      direction = ent.direction,
-      force     = ent.force.name
-    })
-  end
+  destroy_all_characters(global.backup)
 
 end)
 
@@ -48,19 +48,13 @@ script.on_event(defines.events.on_player_joined_game, function(event)
 end)
 
 function reset_scenario(num_characters)
-  local surface = game.surfaces["nauvis"]
-  surface.clear()
-
-  surface.set_tiles(global.initial_tiles, true)
-  for _, data in pairs(global.initial_entities) do
-    surface.create_entity{
-      name      = data.name,
-      position  = data.position,
-      direction = data.direction,
-      force     = game.forces[data.force],
-      raise_built = true
-    }
-  end
+  global.backup.clone_area{
+    source_area      = {{-1000,-1000},{1000,1000}},
+    destination_area = {{-1000,-1000},{1000,1000}},
+    destination_surface = global.game_surface,
+    clone_tiles      = true,
+    clone_entities   = true
+  }
 
   spawn_positions = {
     { 0,  0},  -- center
@@ -75,11 +69,30 @@ function reset_scenario(num_characters)
   }
 
   for i = 1, num_characters do
-    surface.create_entity{
+    local char = global.game_surface.create_entity{
       name     = "character",
       position = spawn_positions[i],
       force    = game.forces.player
     }
+
+    if char and char.valid then
+      local inv = char.get_main_inventory()
+      if inv then
+        inv.insert({ name = "wood", count = 1 }) 
+        inv.insert({ name = "burner-mining-drill", count = 1 })
+        inv.insert({ name = "stone-furnace", count = 1 })      
+      end
+
+      local guns_inv = char.get_inventory(defines.inventory.character_guns)
+      if guns_inv then
+        guns_inv.insert({ name = "pistol", count = 1 })
+      end
+
+      local ammo_inv = char.get_inventory(defines.inventory.character_ammo)
+      if ammo_inv then
+        ammo_inv.insert({ name = "firearm-magazine", count = 10 })
+      end
+    end
   end
 end
 
