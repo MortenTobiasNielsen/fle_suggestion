@@ -1,0 +1,27 @@
+{
+  "name": "FLE_Lab",
+  "description": "FLE_Lab",
+  "tags": [
+    "game",
+    "tags"
+  ],
+  "max_players": 0,
+  "visibility":
+  {
+    "public": false,
+    "lan": true
+  },
+  "require_user_verification": false,
+  "max_upload_in_kilobytes_per_second": 0,
+  "autosave_interval": 0,
+  "max_upload_slots": 5,
+  "minimum_latency_in_ticks": 0,
+  "auto_pause": false,
+  "only_admins_can_pause_the_game": false,
+  "ignore_player_limit_for_returning_players": false,
+  "allow_commands": "true",
+  "minimum_segment_size": 25,
+  "minimum_segment_size_peer_count": 20,
+  "maximum_segment_size": 100,
+  "maximum_segment_size_peer_count": 10
+}
