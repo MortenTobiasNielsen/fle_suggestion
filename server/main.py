@@ -63,20 +63,25 @@ def shutdown_factorio_instances(containers: List[Container]) -> None:
 
 if __name__ == "__main__":
     IMAGE = "factorio_0.2.0"
-    SCENARIO_NAME = "FLE_Lab_Medium"
+    SCENARIO_NAME = "FLE_Lab_Easy"
     INSTANCE_COUNT = 1
 
     cmd = ["bash", "image_check.sh", IMAGE]
     try:
         completed = subprocess.run(
             cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            # stdout=subprocess.PIPE,
+            # stderr=subprocess.PIPE,
             text=True,
             check=True,
-            cwd=os.path.dirname(__file__)
+            cwd=os.path.dirname(__file__),
+            timeout=10
         )
         print("Build script output:\n", completed.stdout)
+    except subprocess.TimeoutExpired as e:
+        print(f"⏰ Command timed out after {e.timeout} s")
+        print("This usually means that docker isn't running or is in a bad state. This might be solved by restarting your computer.")
+        exit(1)
     except subprocess.CalledProcessError as e:
         print("❌ build.sh failed!") 
         print("Command:", " ".join(e.cmd))
@@ -91,15 +96,39 @@ if __name__ == "__main__":
     containers = create_factorio_instances(
         image_name = IMAGE,
         scenario_name = SCENARIO_NAME,
-        instance_count= INSTANCE_COUNT,
+        instance_count= INSTANCE_COUNT, 
         first_udp_port = 34197,
         first_rcon_port = 27015,
     )
 
-    cmd = ['docker', 'exec', containers[0].short_id, 'rcon', '/sc', 'rcon.print(game.tick)']
+    def run_rcon(container_id, cmd):
+        proc = subprocess.Popen(
+            ['docker', 'exec',container_id,'rcon','/c',cmd],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        out, err = proc.communicate()
+        return out
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    print(result.stdout)
+    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "reset", 9)']
+    result1 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "reset", 9)')
+    result2 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "electricity_data")')
+    result3 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "building_data")')
+    result4 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "resource_data")')
+    result5 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "character_data")')
+
+    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', '']
+    # result2 = subprocess.run(cmd1, capture_output=True, text=True)
+
+    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "building_data")']
+    # result3 = subprocess.run(cmd1, capture_output=True, text=True)
+
+    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "resource_data")']
+    # result4 = subprocess.run(cmd1, capture_output=True, text=True)
+
+    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "character_data")']
+    # result5 = subprocess.run(cmd1, capture_output=True, text=True)
+
+    # print(result1.stdout)
 
     shutdown_factorio_instances(containers)
     print("All Factorio instances have been shut down.")
