@@ -5,8 +5,6 @@ local crash_site = require("crash-site")
 local util = require("util")
 
 local fle_utils = require("fle_utils")
-local reset = require("reset")
-local walk = require("walk")
 local handle_tick = require("handle_tick")
 local buildings_data = require("data.buildings_data")
 local characters_data = require("data.characters_data")
@@ -22,6 +20,8 @@ local function destroy_all_characters(surface)
 end
 
 script.on_init(function()
+    global.fle = {}
+    global.fle.character_configs = {}
     global.fle.game_surface = game.surfaces["nauvis"]
     global.fle.backup = game.create_surface("scenario_backup")
     global.fle.area = {{-1000, -1000}, {1000, 1000}} -- Change this so it instead uses a radius from the a specific character position
@@ -63,6 +63,23 @@ script.on_event(defines.events.on_tick, function(event)
         if character and character.valid then
             handle_tick.update(character_index)
         end
+
+        local current_step_number =
+            global.fle.character_configs[character_index].step_number
+
+        game.print(string.format(
+                       "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
+                       character_index, character.position.x,
+                       character.position.y,
+                       global.fle.character_configs[character_index].walking
+                           .walking,
+                       defines.direction[global.fle.character_configs[character_index]
+                           .walking.direction], current_step_number,
+                       global.fle.character_configs[character_index].steps,
+                       global.fle.character_configs[character_index].steps[current_step_number]))
+
+        character.walking_state = global.fle.character_configs[character_index]
+                                      .walking
     end
 end)
 
@@ -117,16 +134,19 @@ function reset_scenario(num_characters)
             end
 
             global.fle.characters[i] = char
-            global.fle.characters[i].walking = {
+            global.fle.character_configs[i] = {}
+            global.fle.character_configs[i].walking = {
                 walking = false,
                 direction = defines.direction.north
             }
-            global.fle.characters[i].destination = {
+            global.fle.character_configs[i].destination = {
                 x = global.fle.characters[i].position.x,
                 y = global.fle.characters[i].position.y
             }
-            global.fle.characters[i].steps = {}
-            global.fle.characters[i].step_number = 0
+            global.fle.character_configs[i].steps = {}
+            global.fle.character_configs[i].step_number = 1
+            global.fle.character_configs[i].idle = 0
+            global.fle.character_configs[i].walk_towards = false
         end
     end
 
@@ -146,13 +166,22 @@ function execute_steps() game.tick_paused = false end
 
 function add_step(character_index, step)
     if not global.fle.characters[character_index] then
+
+        game.print("Character index " .. character_index .. " does not exist.")
+
         return "Character does not exist."
     end
 
     local character = global.fle.characters[character_index]
-    if not character.valid then return "Character is invalid." end
+    if not character.valid then
+        game.print("Character at index " .. character_index .. " is not valid.")
+        return "Character is invalid."
+    end
 
-    table.insert(character.steps, step)
+    game.print(string.format("Adding step for character %d: %s",
+                             character_index, step))
+
+    table.insert(global.fle.character_configs[character_index].steps, step)
 
     return "Step added successfully."
 end

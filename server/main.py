@@ -109,10 +109,11 @@ if __name__ == "__main__":
         data4 = rcon_client.send_command('/c remote.call("AICommands", "resource_data")')
         data5 = rcon_client.send_command('/c remote.call("AICommands", "character_data")')
         data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
-        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
-        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
-        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
-        data6 = rcon_client.send_command('/c remote.call("AICommands", "execute_steps"')
+        data7 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
+        data8 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
+        data9 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
+        data10 = rcon_client.send_command('/c remote.call("AICommands", "execute_steps"')
+        data11 = rcon_client.send_command('/c remote.call("AICommands", "character_data")')
 
     data_dict = json.loads(data4)
 
