@@ -1,80 +1,49 @@
 local json = require("dkjson")
+local fle_utils = require("fle_utils")
 
 local resources_data = {}
-
-local function sq_dist(a, b)
-    local dx = a.x - b.x
-    local dy = a.y - b.y
-    return dx * dx + dy * dy
-end
-
-local function cluster_positions(points, radius)
-    local clusters = {}
-    local visited = {}
-
-    local r2 = radius * radius
-    for i = 1, #points do
-        if not visited[i] then
-            local cluster = {}
-            local queue = {i}
-            visited[i] = true
-
-            while #queue > 0 do
-                local idx = table.remove(queue)
-                local pt = points[idx]
-                cluster[#cluster + 1] = pt
-
-                -- look for neighbors not yet visited
-                for j = 1, #points do
-                    if not visited[j] and sq_dist(pt, points[j]) <= r2 then
-                        visited[j] = true
-                        queue[#queue + 1] = j
-                    end
-                end
-            end
-
-            clusters[#clusters + 1] = cluster
-        end
-    end
-
-    return clusters
-end
+local DECIMALS = 2
 
 function resources_data.get(cluster_radius)
-    local all = global.game_surface.find_entities_filtered {
-        area = {{-30, -30}, {30, 30}},
+    local all = global.fle.game_surface.find_entities_filtered {
+        area = global.fle.area,
         type = {"resource", "tree"}
     }
 
     local out = {trees = {}, resources = {}}
 
-    for _, ent in ipairs(all) do
-        if ent.valid then
+    for _, entity in ipairs(all) do
+        if entity.valid then
+            local box = entity.selection_box
+            local left_top = box.left_top
+            local right_bottom = box.right_bottom
 
-            if ent.type == "tree" then
-                table.insert(out.trees, {x = ent.position.x, y = ent.position.y})
+            local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
+            local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
+            local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
+            local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
+
+            local selection_box = {
+                {x = left_top_x, y = left_top_y},
+                {x = right_bottom_x, y = right_bottom_y}
+            }
+
+            if entity.type == "tree" then
+                table.insert(out.trees, {selection_box = selection_box})
             else
-                local name = ent.name
+                local name = entity.name
                 out.resources[name] = out.resources[name] or {}
                 table.insert(out.resources[name], {
-                    x = ent.position.x,
-                    y = ent.position.y,
-                    amount = ent.amount,
+                    selection_box = selection_box,
+                    amount = entity.amount,
                     yield = (name == "crude-oil") and
-                        math.max(math.floor(ent.amount / 300), 20) or nil
+                        math.max(math.floor(entity.amount / 300), 20) or nil -- The calculation is wrong, but I'm unaware of what it should be
                 })
             end
         end
     end
 
-    cluster_radius = cluster_radius or 2
-    for name, points in pairs(out.resources) do
-        out.resources[name] = cluster_positions(points, cluster_radius)
-    end
-
-    local json_data = json.encode(out)
-
-    return json_data
+    return json.encode(out)
 end
 
 return resources_data

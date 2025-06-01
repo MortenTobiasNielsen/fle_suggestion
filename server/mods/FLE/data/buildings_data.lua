@@ -12,13 +12,13 @@ function buildings_data.get()
     }
 
     -- gather entities
-    local buildings = global.game_surface.find_entities_filtered {
-        area = global.area,
+    local buildings = global.fle.game_surface.find_entities_filtered {
+        area = global.fle.area,
         force = "player"
     }
 
-    for _, ent in ipairs(global.game_surface.find_entities_filtered {
-        area = global.area,
+    for _, ent in ipairs(global.fle.game_surface.find_entities_filtered {
+        area = global.fle.area,
         name = wreck_names
     }) do
 
@@ -42,11 +42,12 @@ function buildings_data.get()
 
             local inventory_stats = {
                 fuel = fle_utils.inventory_stats(building.get_fuel_inventory()),
-                input = fle_utils.inventory_stats(building.get_inventory(defines.inventory
-                                                                   .assembling_machine_input) or
-                                            building.get_inventory(
-                                                defines.inventory.lab_input)),
-                output = fle_utils.inventory_stats(building.get_output_inventory()),
+                input = fle_utils.inventory_stats(
+                    building.get_inventory(defines.inventory
+                                               .assembling_machine_input) or
+                        building.get_inventory(defines.inventory.lab_input)),
+                output = fle_utils.inventory_stats(
+                    building.get_output_inventory()),
                 mods = fle_utils.inventory_stats(building.get_module_inventory())
             }
 
@@ -71,9 +72,7 @@ function buildings_data.get()
         end
     end
 
-    local json_data = json.encode(records)
-
-    return json_data
+    return json.encode(records)
 end
 
 return buildings_data

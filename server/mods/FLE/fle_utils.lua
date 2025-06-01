@@ -8,16 +8,14 @@ function fle_utils.inventory_stats(inv)
     return {slots = slots, empty = empty, items = items}
 end
 
+function fle_utils.floor(x, d)
+    local p = 10 ^ d
+    return math.floor(x * p) / p
+end
 
-function fle_utils.send_data(data, chunk_size)
-    local len = #data
-    local i   = 1
-
-    while i <= len do
-        local part = data:sub(i, i + chunk_size - 1)
-        rcon.print(part)
-        i = i + chunk_size
-    end
+function fle_utils.ceil(x, d)
+    local power = 10 ^ d
+    return math.ceil(x * power) / power
 end
 
 return fle_utils

@@ -1,8 +1,10 @@
 import os
 import subprocess
+import json
 from typing import List
 import docker
 from docker.models.containers import Container
+from factorio_rcon import RCONClient
 
 def create_factorio_instances(
     image_name: str,
@@ -70,8 +72,8 @@ if __name__ == "__main__":
     try:
         completed = subprocess.run(
             cmd,
-            # stdout=subprocess.PIPE,
-            # stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
             check=True,
             cwd=os.path.dirname(__file__),
@@ -92,7 +94,6 @@ if __name__ == "__main__":
 
     client = docker.from_env(timeout=5)
     
-    # 2. Create instances
     containers = create_factorio_instances(
         image_name = IMAGE,
         scenario_name = SCENARIO_NAME,
@@ -101,34 +102,22 @@ if __name__ == "__main__":
         first_rcon_port = 27015,
     )
 
-    def run_rcon(container_id, cmd):
-        proc = subprocess.Popen(
-            ['docker', 'exec',container_id,'rcon','/c',cmd],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        )
-        out, err = proc.communicate()
-        return out
+    with RCONClient("127.0.0.1", 27015, "factorio") as rcon_client:
+        data1 = rcon_client.send_command('/c remote.call("AICommands", "reset", 4)')
+        data2 = rcon_client.send_command('/c remote.call("AICommands", "electricity_data")')
+        data3 = rcon_client.send_command('/c remote.call("AICommands", "building_data")')
+        data4 = rcon_client.send_command('/c remote.call("AICommands", "resource_data")')
+        data5 = rcon_client.send_command('/c remote.call("AICommands", "character_data")')
+        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
+        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
+        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
+        data6 = rcon_client.send_command('/c remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
+        data6 = rcon_client.send_command('/c remote.call("AICommands", "execute_steps"')
 
-    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "reset", 9)']
-    result1 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "reset", 9)')
-    result2 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "electricity_data")')
-    result3 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "building_data")')
-    result4 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "resource_data")')
-    result5 = run_rcon(containers[0].short_id, 'remote.call("AICommands", "character_data")')
-
-    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', '']
-    # result2 = subprocess.run(cmd1, capture_output=True, text=True)
-
-    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "building_data")']
-    # result3 = subprocess.run(cmd1, capture_output=True, text=True)
-
-    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "resource_data")']
-    # result4 = subprocess.run(cmd1, capture_output=True, text=True)
-
-    # cmd1 = ['docker', 'exec', containers[0].short_id, 'rcon', '/c', 'remote.call("AICommands", "character_data")']
-    # result5 = subprocess.run(cmd1, capture_output=True, text=True)
-
-    # print(result1.stdout)
+    data_dict = json.loads(data4)
 
     shutdown_factorio_instances(containers)
     print("All Factorio instances have been shut down.")
+
+    client.images.remove(IMAGE, force=True)
+    print(f"Image {IMAGE} has been removed.")

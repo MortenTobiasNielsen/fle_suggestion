@@ -3,7 +3,11 @@
 local json = require("dkjson")
 local crash_site = require("crash-site")
 local util = require("util")
+
 local fle_utils = require("fle_utils")
+local reset = require("reset")
+local walk = require("walk")
+local handle_tick = require("handle_tick")
 local buildings_data = require("data.buildings_data")
 local characters_data = require("data.characters_data")
 local electricity_data = require("data.electricity_data")
@@ -18,19 +22,19 @@ local function destroy_all_characters(surface)
 end
 
 script.on_init(function()
-    global.game_surface = game.surfaces["nauvis"]
-    global.backup = game.create_surface("scenario_backup")
-    global.area = {{-1000, -1000}, {1000, 1000}}
+    global.fle.game_surface = game.surfaces["nauvis"]
+    global.fle.backup = game.create_surface("scenario_backup")
+    global.fle.area = {{-1000, -1000}, {1000, 1000}} -- Change this so it instead uses a radius from the a specific character position
 
-    global.game_surface.clone_area {
-        source_area = global.area,
-        destination_area = global.area,
-        destination_surface = global.backup,
+    global.fle.game_surface.clone_area {
+        source_area = global.fle.area,
+        destination_area = global.fle.area,
+        destination_surface = global.fle.backup,
         clone_tiles = true,
         clone_entities = true
     }
 
-    destroy_all_characters(global.backup)
+    destroy_all_characters(global.fle.backup)
 
 end)
 
@@ -52,11 +56,21 @@ script.on_event(defines.events.on_player_joined_game, function(event)
     end
 end)
 
+script.on_event(defines.events.on_tick, function(event)
+    if not global.fle.characters then return end
+
+    for character_index, character in pairs(global.fle.characters) do
+        if character and character.valid then
+            handle_tick.update(character_index)
+        end
+    end
+end)
+
 function reset_scenario(num_characters)
-    global.backup.clone_area {
-        source_area = global.area,
-        destination_area = global.area,
-        destination_surface = global.game_surface,
+    global.fle.backup.clone_area {
+        source_area = global.fle.area,
+        destination_area = global.fle.area,
+        destination_surface = global.fle.game_surface,
         clone_tiles = true,
         clone_entities = true
     }
@@ -73,10 +87,10 @@ function reset_scenario(num_characters)
         {-2, -2} -- southwest
     }
 
-    global.characters = {}
+    global.fle.characters = {}
 
     for i = 1, num_characters do
-        local char = global.game_surface.create_entity {
+        local char = global.fle.game_surface.create_entity {
             name = "character",
             position = spawn_positions[i],
             force = game.forces.player
@@ -102,7 +116,17 @@ function reset_scenario(num_characters)
                 ammo_inv.insert({name = "firearm-magazine", count = 10})
             end
 
-            global.characters[i] = char
+            global.fle.characters[i] = char
+            global.fle.characters[i].walking = {
+                walking = false,
+                direction = defines.direction.north
+            }
+            global.fle.characters[i].destination = {
+                x = global.fle.characters[i].position.x,
+                y = global.fle.characters[i].position.y
+            }
+            global.fle.characters[i].steps = {}
+            global.fle.characters[i].step_number = 0
         end
     end
 
@@ -110,12 +134,27 @@ function reset_scenario(num_characters)
         local crashed_ship_items = remote.call("freeplay", "get_ship_items")
         local crashed_debris_items = remote.call("freeplay", "get_debris_items")
 
-        crash_site.create_crash_site(global.game_surface, {-5, -6},
+        crash_site.create_crash_site(global.fle.game_surface, {-5, -6},
                                      util.copy(crashed_ship_items),
                                      util.copy(crashed_debris_items))
     end
 
     return "Scenario reset with " .. num_characters .. " characters."
+end
+
+function execute_steps() game.tick_paused = false end
+
+function add_step(character_index, step)
+    if not global.fle.characters[character_index] then
+        return "Character does not exist."
+    end
+
+    local character = global.fle.characters[character_index]
+    if not character.valid then return "Character is invalid." end
+
+    table.insert(character.steps, step)
+
+    return "Step added successfully."
 end
 
 remote.add_interface("AICommands", {
@@ -125,30 +164,16 @@ remote.add_interface("AICommands", {
                 "Invalid number of characters. Please specify a number between 1 and 9.")
         end
 
-        local out = reset_scenario(num_characters)
-        fle_utils.send_data(out, DATA_CHUNK_SIZE)
-        return out
+        rcon.print(reset_scenario(num_characters))
     end,
-    electricity_data = function() 
-        local out = electricity_data.get()
-        fle_utils.send_data(out, DATA_CHUNK_SIZE)
-        return out
+    electricity_data = function() rcon.print(electricity_data.get()) end,
+    building_data = function() rcon.print(buildings_data.get()) end,
+    character_data = function() rcon.print(characters_data.get()) end,
+    resource_data = function() rcon.print(resources_data.get()) end,
+    add_step = function(character_index, step)
+        rcon.print(add_step(character_index, step))
     end,
-    building_data = function()
-        local out = buildings_data.get()
-        fle_utils.send_data(out, DATA_CHUNK_SIZE)
-        return out
-    end,
-    character_data = function() 
-        local out = characters_data.get()
-       fle_utils.send_data(out, DATA_CHUNK_SIZE)
-        return out
-    end,
-    resource_data = function()
-        local out = resources_data.get()
-        fle_utils.send_data(out, DATA_CHUNK_SIZE)
-        return out
-    end
+    execute_steps = function() rcon.print(execute_steps()) end
 })
 
 commands.add_command("flip",
@@ -157,7 +182,7 @@ commands.add_command("flip",
     local player = game.get_player(cmd.player_index)
     if not (player and player.valid) then return end
 
-    local characters = global.characters
+    local characters = global.fle.characters
     if #characters == 0 then
         player.print("No characters available to flip through.")
         return

@@ -3,9 +3,9 @@ local json = require("dkjson")
 local electricity_data = {}
 
 function electricity_data.get()
-    local surface = global.game_surface
+    local surface = global.fle.game_surface
     local pole = surface.find_entities_filtered{
-        area = global.area,
+        area = global.fle.area,
         type = "electric-pole"
     }[1]
     if not pole or not pole.valid then
@@ -44,10 +44,7 @@ function electricity_data.get()
     end
 
     local record = {production = prod * 60 / 1000, capacity = cap * 60 / 1000}
-    
-    local json_data = json.encode(record)
-
-    return json_data
+    return json.encode(record)
 end
 
 return electricity_data

@@ -4,14 +4,14 @@ local fle_utils = require("fle_utils")
 local characters_data = {}
 
 function characters_data.get()
-    local characters = global.characters
+    local characters = global.fle.characters
     if not characters or #characters == 0 then
         return
             "No characters initialized. Please use /c remote.call('AICommands', 'reset', 1) to initialize."
     end
 
     records = {}
-    for _, character in ipairs(global.characters) do
+    for _, character in ipairs(global.fle.characters) do
         if character.valid then
             local position = {
                 x = character.position.x,
@@ -43,9 +43,7 @@ function characters_data.get()
         end
     end
 
-    local json_data = json.encode(records)
-
-    return json_data
+    return json.encode(records)
 end
 
 return characters_data
