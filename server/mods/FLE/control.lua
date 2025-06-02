@@ -160,6 +160,7 @@ function reset_scenario(num_characters)
             }
             global.fle.character_configs[i].steps = {}
             global.fle.character_configs[i].step_number = 1
+            global.fle.character_configs[i].step_reached = 1
             global.fle.character_configs[i].idle = 0
             global.fle.character_configs[i].walk_towards = false
         end

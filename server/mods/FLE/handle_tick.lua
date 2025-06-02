@@ -1,5 +1,6 @@
 local walk = require("actions.walk")
 local take = require("actions.take")
+local build = require("actions.build")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -42,12 +43,12 @@ local function doStep(character, character_config, current_step)
         return cancel_crafting()
 
     elseif action == "build" then
-        global.tas.task_category = "Build"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        global.tas.direction = current_step[5]
-        return build()
+        -- global.tas.task_category = "Build"
+        -- global.tas.task = current_step[1]
+        -- global.tas.target_position = current_step[3]
+        -- global.tas.item = current_step[4]
+        -- global.tas.direction = current_step[5]
+        return build(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4])
 
     elseif action == "take" then
         -- global.tas.task_category = "Take"

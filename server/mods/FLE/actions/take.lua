@@ -149,6 +149,8 @@ function take.quantity(character, character_config, target_position, item,
         moved = moved + stack_count
     end
 
+    global.fle.game_surface.play_sound {path = "utility/inventory_move", position = target_position}
+
     local player = character.player
     if player then
         local text = string.format("+%d %s (%d)", quantity,
@@ -159,7 +161,6 @@ function take.quantity(character, character_config, target_position, item,
                 2 * global.font_size,
             y = character_config.target_inventory.entity_owner.position.y
         }
-        player.play_sound {path = "utility/inventory_move"}
         player.create_local_flying_text {text = text, position = pos}
     end
 

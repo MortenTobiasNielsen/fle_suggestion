@@ -76,4 +76,23 @@ function fle_utils.format_name(str)
 	return str:gsub("^%l", string.upper):gsub("-", " ") --uppercase first letter and replace dashes with spaces
 end
 
+function fle_utils.item_is_tile(item)
+	if item == "stone-brick"
+	or item == "concrete"
+    or item == "hazard-concrete"
+    or item == "refined-concrete"
+    or item == "refined-hazard-concrete"
+    or item == "landfill" then
+        return true
+    end
+    return false
+end
+
+function fle_utils.tile_is_in_reach(character, target_position)	
+	local x = character.position.x - target_position[1]
+	local y = character.position.y - target_position[2]
+	local dis = math.sqrt(x^2+y^2) --sqrt(a^2+b^2)=sqrt(c^2)
+	return dis <= 10.25 -- It seems like 10.25 aligns best with the current walking algorithm
+end
+
 return fle_utils
