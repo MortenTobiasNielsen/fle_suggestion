@@ -22,6 +22,7 @@ end
 script.on_init(function()
     global.fle = {}
     global.fle.character_configs = {}
+    global.font_size = 0.15
     global.fle.game_surface = game.surfaces["nauvis"]
     global.fle.backup = game.create_surface("scenario_backup")
     global.fle.area = {{-1000, -1000}, {1000, 1000}} -- Change this so it instead uses a radius from the a specific character position

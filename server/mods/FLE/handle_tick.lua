@@ -1,4 +1,6 @@
 local walk = require("actions.walk")
+local take = require("actions.take")
+local fle_utils = require("fle_utils")
 
 local handle_tick = {}
 
@@ -7,7 +9,7 @@ local function change_step(character_config)
 end
 
 local function update_walking(character, character_config, step)
-    local destination = {x = step[2][1], y = step[2][2]}
+    local destination = fle_utils.to_position(step[2])
 
     walk.update_destination_position(character_config, destination)
     walk.find_walking_pattern(character, character_config)
@@ -17,27 +19,29 @@ local function update_walking(character, character_config, step)
     change_step(character_config)
 end
 
-local function doStep(current_step)
+local function doStep(character, character_config, current_step)
 
     global.vehicle = current_step.vehicle
     global.wait_for_recipe = current_step.wait_for
     global.cancel = current_step.cancel
 
-    if current_step[2] == "craft" then
+    local action = current_step[1]
+
+    if action == "craft" then
         global.tas.task_category = "Craft"
         global.tas.task = current_step[1]
         global.tas.count = current_step[3]
         global.tas.item = current_step[4]
         return craft()
 
-    elseif current_step[2] == "cancel crafting" then
+    elseif action == "cancel crafting" then
         global.tas.task_category = "Cancel craft"
         global.tas.task = current_step[1]
         global.tas.count = current_step[3]
         global.tas.item = current_step[4]
         return cancel_crafting()
 
-    elseif current_step[2] == "build" then
+    elseif action == "build" then
         global.tas.task_category = "Build"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -45,21 +49,21 @@ local function doStep(current_step)
         global.tas.direction = current_step[5]
         return build()
 
-    elseif current_step[2] == "take" then
-        global.tas.task_category = "Take"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        global.tas.amount = current_step[5]
-        global.tas.slot = current_step[6]
+    elseif action == "take" then
+        -- global.tas.task_category = "Take"
+        -- global.tas.task = current_step[1]
+        -- global.tas.target_position = current_step[3]
+        -- global.tas.item = current_step[4]
+        -- global.tas.amount = current_step[5]
+        -- global.tas.slot = current_step[6]
 
         if current_step.all then
             return take_all()
         else
-            return take()
+            return take.quantity(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5]  )
         end
 
-    elseif current_step[2] == "put" then
+    elseif action == "put" then
         global.tas.task_category = "Put"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -68,27 +72,27 @@ local function doStep(current_step)
         global.tas.slot = current_step[6]
         return put()
 
-    elseif current_step[2] == "rotate" then
+    elseif action == "rotate" then
         global.tas.task_category = "Rotate"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
         global.tas.rev = current_step[4]
         return rotate()
 
-    elseif current_step[2] == "tech" then
+    elseif action == "tech" then
         global.tas.task_category = "Tech"
         global.tas.task = current_step[1]
         global.tas.item = current_step[3]
         return tech()
 
-    elseif current_step[2] == "recipe" then
+    elseif action == "recipe" then
         global.tas.task_category = "Recipe"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
         global.tas.item = current_step[4]
         return recipe()
 
-    elseif current_step[2] == "limit" then
+    elseif action == "limit" then
         global.tas.task_category = "limit"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -96,7 +100,7 @@ local function doStep(current_step)
         global.tas.slot = current_step[5]
         return limit()
 
-    elseif current_step[2] == "priority" then
+    elseif action == "priority" then
         global.tas.task_category = "priority"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -104,7 +108,7 @@ local function doStep(current_step)
         global.tas.output = current_step[5]
         return priority()
 
-    elseif current_step[2] == "filter" then
+    elseif action == "filter" then
         global.tas.task_category = "filter"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -113,46 +117,46 @@ local function doStep(current_step)
         global.tas.type = current_step[6]
         return filter()
 
-    elseif current_step[2] == "drop" then
+    elseif action == "drop" then
         global.tas.task = current_step[1]
         global.tas.drop_position = current_step[3]
         global.tas.drop_item = current_step[4]
         return drop()
 
-    elseif current_step[2] == "pick" then
+    elseif action == "pick" then
         global.tas.player.picking_state = true
         return true
 
-    elseif current_step[2] == "idle" then
+    elseif action == "idle" then
         global.tas.idle = current_step[3]
         return true
 
-    elseif current_step[2] == "launch" then
+    elseif action == "launch" then
         global.tas.task_category = "launch"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
         return launch()
 
-    elseif current_step[2] == "next" then
+    elseif action == "next" then
         global.tas.task_category = "next"
         global.tas.task = current_step[1]
         return Next()
 
-    elseif current_step[2] == "shoot" then
+    elseif action == "shoot" then
         global.tas.task_category = "shoot"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
         global.tas.amount = current_step[4]
         return shoot()
 
-    elseif current_step[2] == "throw" then
+    elseif action == "throw" then
         global.tas.task_category = "throw"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
         global.tas.item = current_step[4]
         return throw()
 
-    elseif current_step[2] == "equip" then
+    elseif action == "equip" then
         global.tas.task_category = "equip"
         global.tas.task = current_step[1]
         global.tas.amount = current_step[3]
@@ -160,12 +164,12 @@ local function doStep(current_step)
         global.tas.slot = current_step[5]
         return equip()
 
-    elseif current_step[2] == "enter" then
+    elseif action == "enter" then
         global.tas.task_category = "enter"
         global.tas.task = current_step[1]
         return enter()
 
-    elseif current_step[2] == "send" then
+    elseif action == "send" then
         global.tas.task_category = "send"
         global.tas.task = current_step[1]
         global.tas.target_position = current_step[3]
@@ -238,15 +242,15 @@ local function handle_ontick(character, character_config, step)
         elseif action == "mine" then
             update_mining(character, character_config, step)
 
-        -- elseif doStep(step) then
-        --     change_step(character_config)
+        elseif doStep(character, character_config, step) then
+            change_step(character_config)
         end
     else
         if global.walk_towards_state and action == "mine" then
             update_mining(character, character_config, step)
 
         elseif action ~= "walk" and action ~= "idle" and action ~= "mine" then
-            -- if doStep(step) then change_step(character_config) end
+            if doStep(character, character_config, step) then change_step(character_config) end
         end
     end
 end

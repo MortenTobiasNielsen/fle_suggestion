@@ -102,23 +102,29 @@ if __name__ == "__main__":
         first_rcon_port = 27015,
     )
 
-    with RCONClient("127.0.0.1", 27015, "factorio") as rcon_client:
-        data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 4)')
-        data2 = rcon_client.send_command('/sc remote.call("AICommands", "electricity_data")')
-        data3 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
-        data4 = rcon_client.send_command('/sc remote.call("AICommands", "resource_data")')
-        data5 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
-        data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
-        data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
-        data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
-        data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
-        data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
-        data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
-        data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
-        data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
-        data10 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps"')
-        data11 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
-        data12 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
+    try:
+        with RCONClient("127.0.0.1", 27015, "factorio") as rcon_client:
+            data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 4)')
+            data2 = rcon_client.send_command('/sc remote.call("AICommands", "electricity_data")')
+            data3 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
+            data4 = rcon_client.send_command('/sc remote.call("AICommands", "resource_data")')
+            data5 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
+            data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
+            data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
+            data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
+            data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
+            data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
+            data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
+            data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
+            data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps"')
+            data11 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
+            data12 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
+    except Exception as e:
+        print(f"Error during RCON communication: {e}")
+        shutdown_factorio_instances(containers)
+        client.images.remove(IMAGE, force=True)
+        exit(1)
 
     data_dict = json.loads(data4)
 

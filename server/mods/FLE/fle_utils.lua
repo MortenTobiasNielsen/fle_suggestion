@@ -18,41 +18,62 @@ function fle_utils.ceil(x, d)
     return math.ceil(x * power) / power
 end
 
-function fle_utils.check_selection_reach(character, character_config, target_position)
-	character.update_selected_entity(target_position)
+function fle_utils.check_selection_reach(character, character_config,
+                                         target_position)
+    character.update_selected_entity(target_position)
 
-	if not character.selected then
-		if not character_config.walking.walking then
-			Warning(string.format("Step: %s, Action: %s, Step: %d - %s: Cannot select entity", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.task_category))
-		end
+    if not character.selected then
+        if not character_config.walking.walking then
+            Warning(string.format(
+                        "Step: %s, Action: %s, Step: %d - %s: Cannot select entity",
+                        global.tas.task[1], global.tas.task[2], global.tas.step,
+                        global.tas.task_category))
+        end
 
-		return false
-	end
+        return false
+    end
 
-	if not character.can_reach_entity(character.selected) then
-		if not character_config.walking.walking then
-			Warning(string.format("Step: %s, Action: %s, Step: %d - %s: Cannot reach entity", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.task_category))
-		end
+    if not character.can_reach_entity(character.selected) then
+        if not character_config.walking.walking then
+            Warning(string.format(
+                        "Step: %s, Action: %s, Step: %d - %s: Cannot reach entity",
+                        global.tas.task[1], global.tas.task[2], global.tas.step,
+                        global.tas.task_category))
+        end
 
-		return false
-	end
+        return false
+    end
 
-	return true
+    return true
 end
 
 -- Check that it is possible to get the inventory of the entity
-local function check_inventory(character, character_config, inventory_type)
-	character_config.target_inventory = character.selection.get_inventory(inventory_type) or character.selection.get_inventory(1)
+function fle_utils.check_inventory(character, character_config, inventory_type)
+    character_config.target_inventory = character.selected.get_inventory(
+                                            inventory_type) or
+                                            character.selected.get_inventory(1)
 
-	if not character_config.target_inventory then
-		if not character_config.walking.walking then
-			Warning(string.format("Step: %s, Action: %s, Step: %d - %s: Cannot get entity inventory", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.task_category))
-		end
+    if not character_config.target_inventory then
+        if not character_config.walking.walking then
+            Warning(string.format(
+                        "Step: %s, Action: %s, Step: %d - %s: Cannot get entity inventory",
+                        global.tas.task[1], global.tas.task[2], global.tas.step,
+                        global.tas.task_category))
+        end
 
-		return false
-	end
+        return false
+    end
 
-	return true
+    return true
+end
+
+function fle_utils.to_position(position)
+    if not position then return nil end
+    return {x = position[1], y = position[2]}
+end
+
+function fle_utils.format_name(str)
+	return str:gsub("^%l", string.upper):gsub("-", " ") --uppercase first letter and replace dashes with spaces
 end
 
 return fle_utils
