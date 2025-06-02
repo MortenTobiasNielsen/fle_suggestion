@@ -104,20 +104,54 @@ if __name__ == "__main__":
 
     try:
         with RCONClient("127.0.0.1", 27015, "factorio") as rcon_client:
-            data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 4)')
+            data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 1)')
             data2 = rcon_client.send_command('/sc remote.call("AICommands", "electricity_data")')
             data3 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
             data4 = rcon_client.send_command('/sc remote.call("AICommands", "resource_data")')
             data5 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
-            data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
-            data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
-            data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
-            data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
-            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
-            data11 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
-            data12 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
-            data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
-            data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"build", {30.0, 21.0}, "burner-mining-drill", defines.direction.west})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 500, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "burner-mining-drill", 50, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "stone-furnace", 50, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "transport-belt", 500, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "small-electric-pole", 100, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "assembling-machine-1", 20, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "pipe", 100, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "pipe-to-ground", 50, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "pumpjack", 5, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "oil-refinery", 5, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "chemical-plant", 5, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "inserter", 50, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "burner-inserter", 50, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "wooden-chest", 10, defines.inventory.fuel})')
+            # data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, 15}})')
+            # # data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, -15}})')
+            # # data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
+            # # data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
+            # # data11 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
+            # # data12 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
+            # # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
+            # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"build", {30.0, 21.0}, "burner-mining-drill", defines.direction.west})')
+            # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"put", {30.0, 21.0}, "coal", 5, defines.inventory.fuel})')
+            # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"build", {28.0, 21.0}, "stone-furnace", defines.direction.north})')
+            # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"put", {28.0, 21.0}, "coal", 3, defines.inventory.fuel})')
+
+
+            # read steps.lua and loop over each line
+            steps_path = os.path.join(os.path.dirname(__file__), "steps.lua")
+            if os.path.exists(steps_path):
+                with open(steps_path, "r", encoding="utf-8") as steps_file:
+                    for line in steps_file:
+                        line = line.strip()
+                        if not line or line.startswith("--"):  # skip empty lines and Lua comments
+                            continue
+                        try:
+                            response = rcon_client.send_command(f'/sc remote.call("AICommands", "add_step", 1, {line})')
+                            print(f"Sent: {line}\nResponse: {response}")
+                        except Exception as e:
+                            print(f"Failed to send command '{line}': {e}")
+            else:
+                print(f"steps.lua not found at {steps_path}")
+
             data14 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
             data15 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
             data16 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')

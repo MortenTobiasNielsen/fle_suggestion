@@ -2,6 +2,7 @@ local json = require("dkjson")
 local fle_utils = require("fle_utils")
 
 local buildings_data = {}
+local DECIMALS = 2
 
 function buildings_data.get()
     local wreck_names = {
@@ -55,14 +56,21 @@ function buildings_data.get()
             local left_top = box.left_top
             local right_bottom = box.right_bottom
 
+            local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
+            local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
+            local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
+            local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
+
+            local selection_box = {
+                {x = left_top_x, y = left_top_y},
+                {x = right_bottom_x, y = right_bottom_y}
+            }
+
             -- build one Lua table representing the whole entity
             local record = {
                 name = building.name,
                 position = {x = building.position.x, y = building.position.y},
-                selection_box = {
-                    {x = left_top.x, y = left_top.y},
-                    {x = right_bottom.x, y = right_bottom.y}
-                },
+                selection_box = selection_box,
                 status = status,
                 direction = direction,
                 inventory = inventory_stats

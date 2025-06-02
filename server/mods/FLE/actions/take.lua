@@ -71,23 +71,23 @@ function take.quantity(character, character_config, target_position, item,
                                  .get_insertable_count(item)
 
     if removalable_items == 0 then
-        if not global.tas.walking.walking then
-            Warning({
-                "step-warning.take", global.tas.task[1], global.tas.task[2],
-                global.tas.step, fle_utils.format_name(item),
-                "is not available from the inventory"
-            })
+        if not character_config.walking.walking then
+            -- Warning({
+            --     "step-warning.take", global.tas.task[1], global.tas.task[2],
+            --     global.tas.step, fle_utils.format_name(item),
+            --     "is not available from the inventory"
+            -- })
         end
 
         return false;
     end
 
     if insertable_items == 0 then
-        if not global.tas.walking.walking then
-            Warning(string.format(
-                        "Step_number: %d - Take: %s can't be put into your inventory",
-                        character_config.step_number,
-                        fle_utils.format_name(item)))
+        if not character_config.walking.walking then
+            -- Warning(string.format(
+            --             "Step_number: %d - Take: %s can't be put into your inventory",
+            --             character_config.step_number,
+            --             fle_utils.format_name(item)))
         end
 
         return false;
@@ -98,12 +98,12 @@ function take.quantity(character, character_config, target_position, item,
     end
 
     if quantity > removalable_items or quantity > insertable_items then
-        if not global.tas.walking.walking then
-            Warning(string.format(
-                        "Step_number: %d - Take: not enough %s can be transferred. Quantity: %d Removalable: %d Insertable: %d",
-                        character_config.step_number,
-                        fle_utils.format_name(item), quantity,
-                        removalable_items, insertable_items))
+        if not character_config.walking.walking then
+            -- Warning(string.format(
+            --             "Step_number: %d - Take: not enough %s can be transferred. Quantity: %d Removalable: %d Insertable: %d",
+            --             character_config.step_number,
+            --             fle_utils.format_name(item), quantity,
+            --             removalable_items, insertable_items))
         end
 
         return false
@@ -149,7 +149,10 @@ function take.quantity(character, character_config, target_position, item,
         moved = moved + stack_count
     end
 
-    global.fle.game_surface.play_sound {path = "utility/inventory_move", position = target_position}
+    global.fle.game_surface.play_sound {
+        path = "utility/inventory_move",
+        position = target_position
+    }
 
     local player = character.player
     if player then
@@ -157,8 +160,8 @@ function take.quantity(character, character_config, target_position, item,
                                    fle_utils.format_name(item),
                                    character.get_item_count(item)) -- "+2 Iron plate (5)"
         local pos = {
-            x = character_config.target_inventory.entity_owner.position.x + #text /
-                2 * global.font_size,
+            x = character_config.target_inventory.entity_owner.position.x +
+                #text / 2 * global.font_size,
             y = character_config.target_inventory.entity_owner.position.y
         }
         player.create_local_flying_text {text = text, position = pos}

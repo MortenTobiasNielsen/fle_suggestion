@@ -1,6 +1,7 @@
 local walk = require("actions.walk")
 local take = require("actions.take")
 local build = require("actions.build")
+local put = require("actions.put")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -61,17 +62,17 @@ local function doStep(character, character_config, current_step)
         if current_step.all then
             return take_all()
         else
-            return take.quantity(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5]  )
+            return take.quantity(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5])
         end
 
     elseif action == "put" then
-        global.tas.task_category = "Put"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        global.tas.amount = current_step[5]
-        global.tas.slot = current_step[6]
-        return put()
+        -- global.tas.task_category = "Put"
+        -- global.tas.task = current_step[1]
+        -- global.tas.target_position = current_step[3]
+        -- global.tas.item = current_step[4]
+        -- global.tas.amount = current_step[5]
+        -- global.tas.slot = current_step[6]
+        return put(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5])
 
     elseif action == "rotate" then
         global.tas.task_category = "Rotate"

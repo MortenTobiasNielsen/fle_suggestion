@@ -1,3 +1,5 @@
+local util = require("util")
+
 local fle_utils = {}
 
 function fle_utils.inventory_stats(inv)
@@ -24,10 +26,10 @@ function fle_utils.check_selection_reach(character, character_config,
 
     if not character.selected then
         if not character_config.walking.walking then
-            Warning(string.format(
-                        "Step: %s, Action: %s, Step: %d - %s: Cannot select entity",
-                        global.tas.task[1], global.tas.task[2], global.tas.step,
-                        global.tas.task_category))
+            -- Warning(string.format(
+            --             "Step: %s, Action: %s, Step: %d - %s: Cannot select entity",
+            --             global.tas.task[1], global.tas.task[2], global.tas.step,
+            --             global.tas.task_category))
         end
 
         return false
@@ -35,10 +37,10 @@ function fle_utils.check_selection_reach(character, character_config,
 
     if not character.can_reach_entity(character.selected) then
         if not character_config.walking.walking then
-            Warning(string.format(
-                        "Step: %s, Action: %s, Step: %d - %s: Cannot reach entity",
-                        global.tas.task[1], global.tas.task[2], global.tas.step,
-                        global.tas.task_category))
+            -- Warning(string.format(
+            --             "Step: %s, Action: %s, Step: %d - %s: Cannot reach entity",
+            --             global.tas.task[1], global.tas.task[2], global.tas.step,
+            --             global.tas.task_category))
         end
 
         return false
@@ -55,10 +57,10 @@ function fle_utils.check_inventory(character, character_config, inventory_type)
 
     if not character_config.target_inventory then
         if not character_config.walking.walking then
-            Warning(string.format(
-                        "Step: %s, Action: %s, Step: %d - %s: Cannot get entity inventory",
-                        global.tas.task[1], global.tas.task[2], global.tas.step,
-                        global.tas.task_category))
+            -- Warning(string.format(
+            --             "Step: %s, Action: %s, Step: %d - %s: Cannot get entity inventory",
+            --             global.tas.task[1], global.tas.task[2], global.tas.step,
+            --             global.tas.task_category))
         end
 
         return false
@@ -88,11 +90,8 @@ function fle_utils.item_is_tile(item)
     return false
 end
 
-function fle_utils.tile_is_in_reach(character, target_position)	
-	local x = character.position.x - target_position[1]
-	local y = character.position.y - target_position[2]
-	local dis = math.sqrt(x^2+y^2) --sqrt(a^2+b^2)=sqrt(c^2)
-	return dis <= 10.25 -- It seems like 10.25 aligns best with the current walking algorithm
+function fle_utils.is_within_range(character, target_position)
+  return character.build_distance >= util.distance(character.position, target_position)
 end
 
 return fle_utils
