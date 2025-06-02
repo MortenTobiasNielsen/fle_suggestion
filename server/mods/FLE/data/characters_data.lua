@@ -11,11 +11,11 @@ function characters_data.get()
     end
 
     records = {}
-    for _, character in ipairs(global.fle.characters) do
+    for character_index, character in ipairs(global.fle.characters) do
         if character.valid then
             local position = {
-                x = character.position.x,
-                y = character.position.y
+                x = fle_utils.floor(character.position.x),
+                y = fle_utils.floor(character.position.y)
             }
 
             local main_inv = character.get_inventory(defines.inventory
@@ -29,13 +29,23 @@ function characters_data.get()
             local gun_stats = fle_utils.inventory_stats(gun_inv)
             local ammo_stats = fle_utils.inventory_stats(ammo_inv)
 
+            local step_string = string.format("Step: %s of %s", global.fle
+                                                  .character_configs[character_index]
+                                                  .step_number, #global.fle
+                                                  .character_configs[character_index]
+                                                  .steps)
+
             local record = {
+                character_index = character_index,
                 position = position,
                 inventory = {
                     main = main_stats,
                     guns = gun_stats,
                     ammo = ammo_stats
-                }
+                },
+                step = step_string,
+                walking_state = character.walking_state,
+                mining_state = character.mining_state
             }
 
             table.insert(records, record)

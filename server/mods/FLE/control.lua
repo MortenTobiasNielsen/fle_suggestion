@@ -60,26 +60,39 @@ script.on_event(defines.events.on_tick, function(event)
     if not global.fle.characters then return end
 
     for character_index, character in pairs(global.fle.characters) do
-        if character and character.valid then
-            handle_tick.update(character_index)
+        local character_config = global.fle.character_configs[character_index]
+
+        local current_step_number = character_config.step_number
+        local number_of_steps = #character_config.steps
+
+        -- if character_index == 1 then
+        --     game.print(string.format("Current_step_number: %d, Steps: %d",
+        --                              current_step_number, number_of_steps))
+        -- end
+
+        character.walking_state = {
+            walking = false,
+            direction = character_config.walking.direction
+        }
+
+        if current_step_number <= number_of_steps then
+            handle_tick.update(character, character_config)
+
+            local current_step_number = character_config.step_number
+
+            if character_index == 1 then
+                game.print(string.format(
+                               "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
+                               character_index, character.position.x,
+                               character.position.y, global.fle
+                                   .character_configs[character_index].walking
+                                   .walking, character_config.walking.direction,
+                               current_step_number, character_config.steps,
+                               character_config.steps[current_step_number]))
+            end
+
+            character.walking_state = character_config.walking
         end
-
-        local current_step_number =
-            global.fle.character_configs[character_index].step_number
-
-        game.print(string.format(
-                       "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
-                       character_index, character.position.x,
-                       character.position.y,
-                       global.fle.character_configs[character_index].walking
-                           .walking,
-                       defines.direction[global.fle.character_configs[character_index]
-                           .walking.direction], current_step_number,
-                       global.fle.character_configs[character_index].steps,
-                       global.fle.character_configs[character_index].steps[current_step_number]))
-
-        character.walking_state = global.fle.character_configs[character_index]
-                                      .walking
     end
 end)
 
@@ -135,6 +148,7 @@ function reset_scenario(num_characters)
 
             global.fle.characters[i] = char
             global.fle.character_configs[i] = {}
+            global.fle.character_configs[i].character_index = i
             global.fle.character_configs[i].walking = {
                 walking = false,
                 direction = defines.direction.north
