@@ -112,7 +112,7 @@ if __name__ == "__main__":
         data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
         data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
         data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')
-        data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, -15}})')
+        data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 50, defines.inventory.fuel})')
         data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, 15}})')
         data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
         data9 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 4, {"walk", {-25, 15}})')

@@ -2,6 +2,7 @@ local json = require("dkjson")
 local fle_utils = require("fle_utils")
 
 local characters_data = {}
+local DECIMALS = 2
 
 function characters_data.get()
     local characters = global.fle.characters
@@ -14,8 +15,8 @@ function characters_data.get()
     for character_index, character in ipairs(global.fle.characters) do
         if character.valid then
             local position = {
-                x = fle_utils.floor(character.position.x),
-                y = fle_utils.floor(character.position.y)
+                x = fle_utils.floor(character.position.x, DECIMALS),
+                y = fle_utils.floor(character.position.y, DECIMALS)
             }
 
             local main_inv = character.get_inventory(defines.inventory

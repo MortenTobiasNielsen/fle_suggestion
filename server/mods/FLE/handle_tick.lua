@@ -1,4 +1,4 @@
-local walk = require("walk")
+local walk = require("actions.walk")
 
 local handle_tick = {}
 
@@ -238,15 +238,15 @@ local function handle_ontick(character, character_config, step)
         elseif action == "mine" then
             update_mining(character, character_config, step)
 
-        elseif doStep(step) then
-            change_step(character_config)
+        -- elseif doStep(step) then
+        --     change_step(character_config)
         end
     else
         if global.walk_towards_state and action == "mine" then
             update_mining(character, character_config, step)
 
         elseif action ~= "walk" and action ~= "idle" and action ~= "mine" then
-            if doStep(step) then change_step(character_config) end
+            -- if doStep(step) then change_step(character_config) end
         end
     end
 end
