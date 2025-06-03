@@ -109,6 +109,7 @@ if __name__ == "__main__":
             data3 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
             data4 = rcon_client.send_command('/sc remote.call("AICommands", "resource_data")')
             data5 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
+            data18 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 500, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "burner-mining-drill", 50, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "stone-furnace", 50, defines.inventory.fuel})')
@@ -126,6 +127,8 @@ if __name__ == "__main__":
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "boiler", 2, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "steam-engine", 2, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "offshore-pump", 2, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"craft", "boiler", 2})')
+
             # data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, 15}})')
             # # data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, -15}})')
             # # data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
@@ -138,6 +141,7 @@ if __name__ == "__main__":
             # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"build", {28.0, 21.0}, "stone-furnace", defines.direction.north})')
             # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"put", {28.0, 21.0}, "coal", 3, defines.inventory.fuel})')
             data14 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
+            data11 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
 
 
             steps_path = os.path.join(os.path.dirname(__file__), "steps.lua")
@@ -166,13 +170,20 @@ if __name__ == "__main__":
             data14 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
             data15 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
             data16 = rcon_client.send_command('/sc remote.call("AICommands", "building_data")')
+            data17 = rcon_client.send_command('/sc remote.call("AICommands", "electricity_data")')
+            data18 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
+            data19 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
+
+            data_dict1 = json.loads(data4)
+            data_dict2 = json.loads(data15)
+            data_dict3 = json.loads(data16)
+            data_dict4 = json.loads(data17)
+            data_dict5 = json.loads(data19)
     except Exception as e:
         print(f"Error during RCON communication: {e}")
         shutdown_factorio_instances(containers)
         client.images.remove(IMAGE, force=True)
         exit(1)
-
-    data_dict = json.loads(data4)
 
     shutdown_factorio_instances(containers)
     print("All Factorio instances have been shut down.")

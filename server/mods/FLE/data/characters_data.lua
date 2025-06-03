@@ -46,9 +46,8 @@ function characters_data()
                 step = step_string,
                 walking_state = character.walking_state,
                 mining_state = character.mining_state,
-                -- crafting_progress = character.crafting_progress,
                 crafting_queue = character.crafting_queue or {},
-                crafting_queue_progress = character.crafting_queue_progress
+                crafting_queue_progress = fle_utils.floor(character.crafting_queue_progress, DECIMALS)
             }
 
             table.insert(data, record)

@@ -4,6 +4,7 @@ local build = require("actions.build")
 local put = require("actions.put")
 local recipe = require("actions.recipe")
 local rotate = require("actions.rotate")
+local craft = require("actions.craft")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -32,11 +33,11 @@ local function doStep(character, character_config, current_step)
     local action = current_step[1]
 
     if action == "craft" then
-        global.tas.task_category = "Craft"
-        global.tas.task = current_step[1]
-        global.tas.count = current_step[3]
-        global.tas.item = current_step[4]
-        return craft()
+        -- global.tas.task_category = "Craft"
+        -- global.tas.task = current_step[1]
+        -- global.tas.count = current_step[3]
+        -- global.tas.item = current_step[4]
+        return craft(character, character_config, current_step[2], current_step[3])
 
     elseif action == "cancel crafting" then
         global.tas.task_category = "Cancel craft"
