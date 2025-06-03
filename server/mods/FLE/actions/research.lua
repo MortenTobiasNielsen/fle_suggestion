@@ -2,17 +2,17 @@ function research(character, name, cancel)
     local force = character.force
     local technology = force.technologies[name]
 
-	if not tech then
+	if not technology then
         -- log("Technology '" .. name .. "' does not exist for force '" .. force.name .. "'.")
         return false
     end
 
-    if tech.researched then
+    if technology.researched then
         -- log("Technology '" .. name .. "' has already been researched.")
         return false
     end
 
-    if not tech.enabled then
+    if not technology.enabled then
         -- log("Technology '" .. name .. "' is not enabled and cannot be researched.")
         return false
     end

@@ -110,6 +110,7 @@ if __name__ == "__main__":
             data4 = rcon_client.send_command('/sc remote.call("AICommands", "resource_data")')
             data5 = rcon_client.send_command('/sc remote.call("AICommands", "character_data")')
             data18 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
+            data18 = rcon_client.send_command('/sc remote.call("AICommands", "research_data")')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "coal", 500, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "burner-mining-drill", 50, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "stone-furnace", 50, defines.inventory.fuel})')
@@ -175,12 +176,15 @@ if __name__ == "__main__":
             data17 = rcon_client.send_command('/sc remote.call("AICommands", "electricity_data")')
             data18 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
             data19 = rcon_client.send_command('/sc remote.call("AICommands", "production_data")')
+            data20 = rcon_client.send_command('/sc remote.call("AICommands", "research_data")')
+
 
             data_dict1 = json.loads(data4)
             data_dict2 = json.loads(data15)
             data_dict3 = json.loads(data16)
             data_dict4 = json.loads(data17)
             data_dict5 = json.loads(data19)
+            data_dict6 = json.loads(data20)
     except Exception as e:
         print(f"Error during RCON communication: {e}")
         shutdown_factorio_instances(containers)

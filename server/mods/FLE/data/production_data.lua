@@ -9,8 +9,9 @@ function production_data()
         consumption = {}
     }
 
+    local force = global.fle.characters[1].force
     -- Retrieve item production statistics
-    local item_stats = global.fle.characters[1].force.item_production_statistics
+    local item_stats = force.item_production_statistics
     for name, _ in pairs(item_stats.input_counts) do
         local quantity = item_stats.get_flow_count{
             name = name,
@@ -36,7 +37,7 @@ function production_data()
     end
 
     -- Retrieve fluid production statistics
-    local fluid_stats = global.fle.characters[1].force.fluid_production_statistics
+    local fluid_stats = force.fluid_production_statistics
     for name, _ in pairs(fluid_stats.input_counts) do
         local quantity = fluid_stats.get_flow_count{
             name = name,

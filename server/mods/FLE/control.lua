@@ -11,6 +11,7 @@ local characters_data = require("data.characters_data")
 local electricity_data = require("data.electricity_data")
 local resources_data = require("data.resources_data")
 local production_data = require("data.production_data")
+local research_data = require("data.research_data")
 
 local function destroy_all_characters(surface)
     for _, entity in pairs(surface.find_entities_filtered {type = "character"}) do
@@ -231,6 +232,7 @@ remote.add_interface("AICommands", {
     character_data = function() rcon.print(characters_data()) end,
     resource_data = function() rcon.print(resources_data()) end,
     production_data = function() rcon.print(production_data()) end,
+    research_data = function() rcon.print(research_data()) end,
     add_step = function(character_index, step)
         rcon.print(add_step(character_index, step))
     end,
