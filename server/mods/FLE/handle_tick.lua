@@ -3,6 +3,7 @@ local take = require("actions.take")
 local build = require("actions.build")
 local put = require("actions.put")
 local recipe = require("actions.recipe")
+local recipe = require("actions.rotate")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -76,11 +77,11 @@ local function doStep(character, character_config, current_step)
         return put(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5])
 
     elseif action == "rotate" then
-        global.tas.task_category = "Rotate"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.rev = current_step[4]
-        return rotate()
+        -- global.tas.task_category = "Rotate"
+        -- global.tas.task = current_step[1]
+        -- global.tas.target_position = current_step[3]
+        -- global.tas.rev = current_step[4]
+        return rotate(character, character_config, current_step[2], current_step[3])
 
     elseif action == "tech" then
         global.tas.task_category = "Tech"
