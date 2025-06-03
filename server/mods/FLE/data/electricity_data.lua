@@ -9,7 +9,13 @@ function electricity_data()
         type = "electric-pole"
     }[1]
     if not pole or not pole.valid then
-        return "No electric pole found in the area."
+        local data = {
+            production = 0,
+            capacity = 0,
+            Info = "No electric pole found in the area."
+        }
+
+        return json.encode(data)
     end
 
     local stats = pole.electric_network_statistics

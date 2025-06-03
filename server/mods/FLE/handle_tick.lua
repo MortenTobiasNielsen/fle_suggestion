@@ -25,6 +25,34 @@ local function update_walking(character, character_config, step)
     change_step(character_config)
 end
 
+local function update_mining(character, character_config, step)
+    local position = fle_utils.to_position(step[2])
+    character.update_selected_entity(position)
+
+    character.mining_state = {mining = true, position = position}
+
+    character_config.duration = step[3]
+    character_config.ticks_mining = character_config.ticks_mining + 1
+
+    if character_config.ticks_mining > character_config.duration then
+        change_step(character_config)
+        character_config.mining = 0
+        character_config.ticks_mining = 0
+        character.mining_state = {mining = false, position = position}
+    end
+
+    character_config.mining = character_config.mining + 1
+    if character_config.mining > 5 then
+        if character.character_mining_progress == 0 then
+            rcon.print(string.format(
+                           "Step: %s, Action: %s: Cannot reach resource",
+                           character_config.step_number, action))
+        else
+            character_config.mining = 0
+        end
+    end
+end
+
 local function doStep(character, character_config, current_step)
 
     global.vehicle = current_step.vehicle
@@ -144,32 +172,6 @@ local function doStep(character, character_config, current_step)
         --     global.tas.task_category = "enter"
         --     global.tas.task = current_step[1]
         --     return enter()
-    end
-end
-
-local function update_mining(character, character_config, step)
-    character.update_selected_entity(step[2])
-
-    character.mining_state = {mining = true, position = step[2]}
-
-    character_config.duration = step[3]
-    character_config.ticks_mining = character_config.ticks_mining + 1
-
-    if character_config.ticks_mining >= character_config.duration then
-        change_step(character_config)
-        character_config.mining = 0
-        character_config.ticks_mining = 0
-    end
-
-    character_config.mining = character_config.mining + 1
-    if character_config.mining > 5 then
-        if character.character_mining_progress == 0 then
-            rcon.print(string.format(
-                           "Step: %s, Action: %s: Cannot reach resource",
-                           character_config.step_number, action))
-        else
-            character_config.mining = 0
-        end
     end
 end
 

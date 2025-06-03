@@ -165,6 +165,8 @@ function reset_scenario(num_characters)
             global.fle.character_configs[i].step_reached = 1
             global.fle.character_configs[i].idle = 0
             global.fle.character_configs[i].idled = 0
+            global.fle.character_configs[i].mining = 0
+            global.fle.character_configs[i].ticks_mining = 0
             global.fle.character_configs[i].walk_towards = false
         end
     end
@@ -199,19 +201,19 @@ end
 function add_step(character_index, step)
     if not global.fle.characters[character_index] then
 
-        game.print("Character index " .. character_index .. " does not exist.")
+        -- game.print("Character index " .. character_index .. " does not exist.")
 
         return "Character does not exist."
     end
 
     local character = global.fle.characters[character_index]
     if not character.valid then
-        game.print("Character at index " .. character_index .. " is not valid.")
+        -- game.print("Character at index " .. character_index .. " is not valid.")
         return "Character is invalid."
     end
 
-    game.print(string.format("Adding step for character %d: %s",
-                             character_index, step))
+    -- game.print(string.format("Adding step for character %d: %s",
+    --                          character_index, step))
 
     table.insert(global.fle.character_configs[character_index].steps, step)
 

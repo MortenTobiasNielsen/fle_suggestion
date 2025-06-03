@@ -1,10 +1,14 @@
 local fle_utils = require("fle_utils")
 
-function take(character, character_config, target_position, item,
-                       quantity, inventory_type)
+function take(character, character_config, target_position, item, quantity,
+              inventory_type)
 
-    if not fle_utils.check_selection_reach(character, character_config,
-                                           target_position) then return false end
+    local can_reach = fle_utils.check_selection_reach(character,
+                                                      character_config,
+                                                      target_position)
+
+    game.print(can_reach)
+    if not can_reach then return false end
 
     if not fle_utils.check_inventory(character, character_config, inventory_type) then
         return false;
