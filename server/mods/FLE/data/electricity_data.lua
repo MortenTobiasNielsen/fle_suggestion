@@ -37,7 +37,6 @@ function electricity_data.get()
         area = area,
         type = "solar-panel"
     }) do
-        game.print(solar)
         if solar.is_connected_to_electric_network() then
             cap = cap + solar.get_electric_output_flow_limit()
         end

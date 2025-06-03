@@ -123,6 +123,9 @@ if __name__ == "__main__":
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "inserter", 50, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "burner-inserter", 50, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "wooden-chest", 10, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "boiler", 2, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "steam-engine", 2, defines.inventory.fuel})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "offshore-pump", 2, defines.inventory.fuel})')
             # data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, 15}})')
             # # data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, -15}})')
             # # data8 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 3, {"walk", {-25, -15}})')
@@ -134,6 +137,7 @@ if __name__ == "__main__":
             # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"put", {30.0, 21.0}, "coal", 5, defines.inventory.fuel})')
             # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"build", {28.0, 21.0}, "stone-furnace", defines.direction.north})')
             # data13 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"put", {28.0, 21.0}, "coal", 3, defines.inventory.fuel})')
+            data14 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
 
 
             # read steps.lua and loop over each line

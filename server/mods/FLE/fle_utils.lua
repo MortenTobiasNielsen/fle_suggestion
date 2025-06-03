@@ -75,23 +75,23 @@ function fle_utils.to_position(position)
 end
 
 function fle_utils.format_name(str)
-	return str:gsub("^%l", string.upper):gsub("-", " ") --uppercase first letter and replace dashes with spaces
+    return str:gsub("^%l", string.upper):gsub("-", " ") -- uppercase first letter and replace dashes with spaces
 end
 
 function fle_utils.item_is_tile(item)
-	if item == "stone-brick"
-	or item == "concrete"
-    or item == "hazard-concrete"
-    or item == "refined-concrete"
-    or item == "refined-hazard-concrete"
-    or item == "landfill" then
-        return true
-    end
+    if item == "stone-brick" or item == "concrete" or item == "hazard-concrete" or
+        item == "refined-concrete" or item == "refined-hazard-concrete" or item ==
+        "landfill" then return true end
     return false
 end
 
 function fle_utils.is_within_range(character, target_position)
-  return character.build_distance >= util.distance(character.position, target_position)
+    local within_distance = character.build_distance +5 >= util.distance(character.position, target_position)
+    if not within_distance then
+        return false
+    end
+
+    return true
 end
 
 return fle_utils

@@ -2,6 +2,7 @@ local walk = require("actions.walk")
 local take = require("actions.take")
 local build = require("actions.build")
 local put = require("actions.put")
+local recipe = require("actions.recipe")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -88,11 +89,11 @@ local function doStep(character, character_config, current_step)
         return tech()
 
     elseif action == "recipe" then
-        global.tas.task_category = "Recipe"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        return recipe()
+        -- global.tas.task_category = "Recipe"
+        -- global.tas.task = current_step[1]
+        -- global.tas.target_position = current_step[3]
+        -- global.tas.item = current_step[4]
+        return recipe(character, character_config, fle_utils.to_position(current_step[2]), current_step[3])
 
     elseif action == "limit" then
         global.tas.task_category = "limit"

@@ -23,7 +23,7 @@ function buildings_data.get()
         name = wreck_names
     }) do
 
-        game.print(ent.get_output_inventory().count_empty_stacks())
+        -- game.print(ent.get_output_inventory().count_empty_stacks())
 
         table.insert(buildings, ent)
     end

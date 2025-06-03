@@ -20,6 +20,7 @@ local function destroy_all_characters(surface)
 end
 
 script.on_init(function()
+    global.tick_paused = true
     global.fle = {}
     global.fle.character_configs = {}
     global.font_size = 0.15
@@ -40,6 +41,7 @@ script.on_init(function()
 end)
 
 script.on_event(defines.events.on_player_joined_game, function(event)
+    global.tick_paused = true
     local p = game.players[event.player_index]
 
     if p.character and p.character.valid then p.character.destroy() end
@@ -82,14 +84,14 @@ script.on_event(defines.events.on_tick, function(event)
             local current_step_number = character_config.step_number
 
             if character_index == 1 then
-                game.print(string.format(
-                               "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
-                               character_index, character.position.x,
-                               character.position.y, global.fle
-                                   .character_configs[character_index].walking
-                                   .walking, character_config.walking.direction,
-                               current_step_number, character_config.steps,
-                               character_config.steps[current_step_number]))
+                -- game.print(string.format(
+                --                "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
+                --                character_index, character.position.x,
+                --                character.position.y, global.fle
+                --                    .character_configs[character_index].walking
+                --                    .walking, character_config.walking.direction,
+                --                current_step_number, character_config.steps,
+                --                character_config.steps[current_step_number]))
             end
 
             character.walking_state = character_config.walking
@@ -174,6 +176,8 @@ function reset_scenario(num_characters)
                                      util.copy(crashed_ship_items),
                                      util.copy(crashed_debris_items))
     end
+
+    game.tick_paused = true
 
     return "Scenario reset with " .. num_characters .. " characters."
 end

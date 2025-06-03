@@ -101,7 +101,7 @@ function put(character, character_config, target_position, item, quantity,
     }
     local player = character.player
     if player then
-        local text = string.format("-%d %s (%d)", quantity, format_name(item),
+        local text = string.format("-%d %s (%d)", quantity, fle_utils.format_name(item),
                                    character.get_item_count(item)) -- "-2 Iron plate (5)"
         local pos = {
             x = character_config.target_inventory.entity_owner.position.x +

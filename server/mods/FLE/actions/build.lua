@@ -149,7 +149,7 @@ function build(character, character_config, target_position, item, direction)
         if (character_config.step_number > character_config.step_reached) then
             if character_config.walking.walking == false then
                 Warning(string.format(
-                            "Step_number: %d - Take: %s not available",
+                            "Step_number: %d - Build: %s not available",
                             character_config.step_number,
                             fle_utils.format_name(item)))
                 character_config.step_reached = character_config.step_number
@@ -200,11 +200,18 @@ function build(character, character_config, target_position, item, direction)
             return false
 
         elseif fle_utils.is_within_range(character, target_position) and
-            global.fle.game_surface.can_place_entity {
+            (global.fle.game_surface.can_place_entity {
                 name = item,
                 position = target_position,
-                direction = direction
-            } then
+                direction = direction,
+                build_check_type = defines.build_check_type.script_ghost,
+                forced = true
+            } or global.fle.game_surface.can_fast_replace{
+                name = item,
+                position = target_position,
+                direction = direction,
+                force = character.force
+            }) then
             -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
             return create_entity_replace(character, character_config,
                                          target_position, item, direction)
