@@ -164,6 +164,7 @@ function reset_scenario(num_characters)
             global.fle.character_configs[i].step_number = 1
             global.fle.character_configs[i].step_reached = 1
             global.fle.character_configs[i].idle = 0
+            global.fle.character_configs[i].idled = 0
             global.fle.character_configs[i].walk_towards = false
         end
     end
@@ -188,7 +189,7 @@ function add_steps(character_index, steps)
     for i = 1, #steps do 
         add_step(character_index, steps[i])
     end
-    
+
     return "Steps added successfully."
 end
 

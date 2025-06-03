@@ -3,7 +3,7 @@ local take = require("actions.take")
 local build = require("actions.build")
 local put = require("actions.put")
 local recipe = require("actions.recipe")
-local recipe = require("actions.rotate")
+local rotate = require("actions.rotate")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -94,6 +94,9 @@ local function doStep(character, character_config, current_step)
         -- global.tas.task = current_step[1]
         -- global.tas.target_position = current_step[3]
         -- global.tas.item = current_step[4]
+
+        game.print(string.format("Recipe %s", current_step[3]))
+
         return recipe(character, character_config, fle_utils.to_position(current_step[2]), current_step[3])
 
     elseif action == "limit" then
@@ -132,7 +135,7 @@ local function doStep(character, character_config, current_step)
         return true
 
     elseif action == "idle" then
-        global.tas.idle = current_step[3]
+        character_config.idle = current_step[2]
         return true
 
     elseif action == "launch" then

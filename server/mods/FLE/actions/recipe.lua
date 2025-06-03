@@ -1,7 +1,6 @@
 local fle_utils = require("fle_utils")
 
 function recipe(character, character_config, target_position, item)
-
 	if not fle_utils.check_selection_reach(character, character_config, target_position) then
 		return false
 	end

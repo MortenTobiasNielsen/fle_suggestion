@@ -287,10 +287,10 @@
 {"build", {-19.500000, 19.500000}, "transport-belt", defines.direction.west}
 {"build", {-13.500000, 20.500000}, "small-electric-pole", defines.direction.north}
 {"build", {-20.500000, 20.500000}, "small-electric-pole", defines.direction.north}
-{"build", {-21.500000, 20.500000}, "inserter", defines.direction.south}
-{"build", {-22.500000, 22.500000}, "assembling-machine-1", defines.direction.north}
-{"recipe", {-22.500000, 22.500000}, "copper-cable"}
-{"build", {-23.500000, 20.500000}, "inserter", defines.direction.south}
+{"build", {-22.500000, 20.500000}, "inserter", defines.direction.south}
+{"build", {-23.500000, 22.500000}, "assembling-machine-1", defines.direction.north}
+{"recipe", {-23.500000, 22.500000}, "copper-cable"}
+{"build", {-24.500000, 20.500000}, "inserter", defines.direction.south}
 {"build", {-22.500000, 19.500000}, "transport-belt", defines.direction.east}
 {"build", {-23.500000, 19.500000}, "transport-belt", defines.direction.east}
 {"build", {-24.500000, 19.500000}, "transport-belt", defines.direction.east}
@@ -299,8 +299,9 @@
 {"build", {-25.500000, 19.500000}, "inserter", defines.direction.west}
 {"build", {-27.000000, 22.000000}, "stone-furnace", defines.direction.north}
 {"put", {-27.000000, 22.000000}, "coal", 6, defines.inventory.fuel}
-{"build", {-25.500000, 20.500000}, "small-electric-pole", defines.direction.north}
-{"build", {-24.500000, 22.500000}, "inserter", defines.direction.west}
+{"build", {-25.500000, 21.500000}, "small-electric-pole", defines.direction.north}
+{"build", {-25.500000, 22.500000}, "inserter", defines.direction.west}
+{"build", {-25.500000, 23.500000}, "inserter", defines.direction.west}
 {"build", {-29.000000, 20.000000}, "burner-mining-drill", defines.direction.east}
 {"put", {-29.000000, 20.000000}, "coal", 12, defines.inventory.fuel}
 {"build", {-27.000000, 24.000000}, "stone-furnace", defines.direction.north}
@@ -372,7 +373,8 @@
 {"build", {29.500000, 8.500000}, "pipe", defines.direction.north}
 {"build", {30.500000, 9.500000}, "pipe", defines.direction.north}
 {"build", {25.500000, 9.500000}, "inserter", defines.direction.south}
-{"build", {24.500000, 9.500000}, "inserter", defines.direction.south}
+{"build", {24.500000, 9.500000}, "burner-inserter", defines.direction.south}
+{"put", {24.500000, 9.500000}, "coal", 2, defines.inventory.fuel}
 {"build", {36.500000, 7.500000}, "chemical-plant", defines.direction.east}
 {"recipe", {36.500000, 7.500000}, "plastic-bar"}
 {"build", {34.500000, 7.500000}, "pipe", defines.direction.north}
