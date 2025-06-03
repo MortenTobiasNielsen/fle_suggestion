@@ -184,6 +184,14 @@ end
 
 function execute_steps() game.tick_paused = false end
 
+function add_steps(character_index, steps)
+    for i = 1, #steps do 
+        add_step(character_index, steps[i])
+    end
+    
+    return "Steps added successfully."
+end
+
 function add_step(character_index, step)
     if not global.fle.characters[character_index] then
 
@@ -221,6 +229,9 @@ remote.add_interface("AICommands", {
     resource_data = function() rcon.print(resources_data.get()) end,
     add_step = function(character_index, step)
         rcon.print(add_step(character_index, step))
+    end,
+    add_steps = function(character_index, steps)
+        rcon.print(add_steps(character_index, steps))
     end,
     execute_steps = function() rcon.print(execute_steps()) end
 })

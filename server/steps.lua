@@ -297,11 +297,14 @@
 {"build", {-27.000000, 20.000000}, "stone-furnace", defines.direction.north}
 {"put", {-27.000000, 20.000000}, "coal", 6, defines.inventory.fuel}
 {"build", {-25.500000, 19.500000}, "inserter", defines.direction.west}
-{"build", {-26.500000, 22.500000}, "electric-furnace", defines.direction.north}
+{"build", {-27.000000, 22.000000}, "stone-furnace", defines.direction.north}
+{"put", {-27.000000, 22.000000}, "coal", 6, defines.inventory.fuel}
 {"build", {-25.500000, 20.500000}, "small-electric-pole", defines.direction.north}
 {"build", {-24.500000, 22.500000}, "inserter", defines.direction.west}
 {"build", {-29.000000, 20.000000}, "burner-mining-drill", defines.direction.east}
 {"put", {-29.000000, 20.000000}, "coal", 12, defines.inventory.fuel}
+{"build", {-27.000000, 24.000000}, "stone-furnace", defines.direction.north}
+{"put", {-27.000000, 24.000000}, "coal", 6, defines.inventory.fuel}
 {"build", {-29.000000, 22.000000}, "burner-mining-drill", defines.direction.east}
 {"put", {-29.000000, 22.000000}, "coal", 12, defines.inventory.fuel}
 {"build", {-29.000000, 24.000000}, "burner-mining-drill", defines.direction.east}

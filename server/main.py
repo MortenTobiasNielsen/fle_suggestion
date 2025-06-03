@@ -140,19 +140,26 @@ if __name__ == "__main__":
             data14 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
 
 
-            # read steps.lua and loop over each line
             steps_path = os.path.join(os.path.dirname(__file__), "steps.lua")
             if os.path.exists(steps_path):
                 with open(steps_path, "r", encoding="utf-8") as steps_file:
+                    steps = "{"
+
                     for line in steps_file:
                         line = line.strip()
                         if not line or line.startswith("--"):  # skip empty lines and Lua comments
                             continue
-                        try:
-                            response = rcon_client.send_command(f'/sc remote.call("AICommands", "add_step", 1, {line})')
-                            print(f"Sent: {line}\nResponse: {response}")
-                        except Exception as e:
-                            print(f"Failed to send command '{line}': {e}")
+                        else:
+                            steps = steps + line + ","
+
+                    steps = steps + "}"
+                    try:
+                        response = rcon_client.send_command(
+                            f'/sc remote.call("AICommands", "add_steps", 1, {steps})'
+                        )
+                        print(f"Sent steps\nResponse: {response}")
+                    except Exception as e:
+                        print(f"Failed to send steps: {e}")
             else:
                 print(f"steps.lua not found at {steps_path}")
 
