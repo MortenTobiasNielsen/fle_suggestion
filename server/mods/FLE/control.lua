@@ -182,7 +182,10 @@ function reset_scenario(num_characters)
     return "Scenario reset with " .. num_characters .. " characters."
 end
 
-function execute_steps() game.tick_paused = false end
+function execute_steps() 
+    game.tick_paused = false 
+    return "Steps set to be executed."
+end
 
 function add_steps(character_index, steps)
     for i = 1, #steps do 

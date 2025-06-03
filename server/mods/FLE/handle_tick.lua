@@ -5,6 +5,7 @@ local put = require("actions.put")
 local recipe = require("actions.recipe")
 local rotate = require("actions.rotate")
 local craft = require("actions.craft")
+local research = require("actions.research")
 local fle_utils = require("fle_utils")
 
 local handle_tick = {}
@@ -33,107 +34,74 @@ local function doStep(character, character_config, current_step)
     local action = current_step[1]
 
     if action == "craft" then
-        -- global.tas.task_category = "Craft"
-        -- global.tas.task = current_step[1]
-        -- global.tas.count = current_step[3]
-        -- global.tas.item = current_step[4]
-        return craft(character, character_config, current_step[2], current_step[3])
-
-    elseif action == "cancel crafting" then
-        global.tas.task_category = "Cancel craft"
-        global.tas.task = current_step[1]
-        global.tas.count = current_step[3]
-        global.tas.item = current_step[4]
-        return cancel_crafting()
-
-    elseif action == "build" then
-        -- global.tas.task_category = "Build"
-        -- global.tas.task = current_step[1]
-        -- global.tas.target_position = current_step[3]
-        -- global.tas.item = current_step[4]
-        -- global.tas.direction = current_step[5]
-        return build(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4])
-
-    elseif action == "take" then
-        -- global.tas.task_category = "Take"
-        -- global.tas.task = current_step[1]
-        -- global.tas.target_position = current_step[3]
-        -- global.tas.item = current_step[4]
-        -- global.tas.amount = current_step[5]
-        -- global.tas.slot = current_step[6]
-
-        if current_step.all then
-            return take_all()
-        else
-            return take.quantity(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5])
+        if current_step.cancel then
+            return craft.cancel(character, character_config, current_step[2],
+                                current_step[3])
         end
 
+        return craft.add(character, character_config, current_step[2],
+                         current_step[3])
+
+    elseif action == "build" then
+        return build(character, character_config,
+                     fle_utils.to_position(current_step[2]), current_step[3],
+                     current_step[4])
+
+    elseif action == "take" then
+        return take(character, character_config,
+                    fle_utils.to_position(current_step[2]), current_step[3],
+                    current_step[4], current_step[5])
+
     elseif action == "put" then
-        -- global.tas.task_category = "Put"
-        -- global.tas.task = current_step[1]
-        -- global.tas.target_position = current_step[3]
-        -- global.tas.item = current_step[4]
-        -- global.tas.amount = current_step[5]
-        -- global.tas.slot = current_step[6]
-        return put(character, character_config, fle_utils.to_position(current_step[2]), current_step[3], current_step[4], current_step[5])
+        return put(character, character_config,
+                   fle_utils.to_position(current_step[2]), current_step[3],
+                   current_step[4], current_step[5])
 
     elseif action == "rotate" then
-        -- global.tas.task_category = "Rotate"
-        -- global.tas.task = current_step[1]
-        -- global.tas.target_position = current_step[3]
-        -- global.tas.rev = current_step[4]
-        return rotate(character, character_config, current_step[2], current_step[3])
+        return rotate(character, character_config, current_step[2],
+                      current_step[3])
 
-    elseif action == "tech" then
-        global.tas.task_category = "Tech"
-        global.tas.task = current_step[1]
-        global.tas.item = current_step[3]
-        return tech()
+    elseif action == "research" then
+        return research(character, current_step[2], current_step.cancel)
 
     elseif action == "recipe" then
-        -- global.tas.task_category = "Recipe"
-        -- global.tas.task = current_step[1]
-        -- global.tas.target_position = current_step[3]
-        -- global.tas.item = current_step[4]
+        return recipe(character, character_config,
+                      fle_utils.to_position(current_step[2]), current_step[3])
 
-        game.print(string.format("Recipe %s", current_step[3]))
+        -- elseif action == "limit" then
+        --     global.tas.task_category = "limit"
+        --     global.tas.task = current_step[1]
+        --     global.tas.target_position = current_step[3]
+        --     global.tas.amount = current_step[4]
+        --     global.tas.slot = current_step[5]
+        --     return limit()
 
-        return recipe(character, character_config, fle_utils.to_position(current_step[2]), current_step[3])
+        -- elseif action == "priority" then
+        --     global.tas.task_category = "priority"
+        --     global.tas.task = current_step[1]
+        --     global.tas.target_position = current_step[3]
+        --     global.tas.input = current_step[4]
+        --     global.tas.output = current_step[5]
+        --     return priority()
 
-    elseif action == "limit" then
-        global.tas.task_category = "limit"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.amount = current_step[4]
-        global.tas.slot = current_step[5]
-        return limit()
+        -- elseif action == "filter" then
+        --     global.tas.task_category = "filter"
+        --     global.tas.task = current_step[1]
+        --     global.tas.target_position = current_step[3]
+        --     global.tas.item = current_step[4]
+        --     global.tas.slot = current_step[5]
+        --     global.tas.type = current_step[6]
+        --     return filter()
 
-    elseif action == "priority" then
-        global.tas.task_category = "priority"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.input = current_step[4]
-        global.tas.output = current_step[5]
-        return priority()
+        -- elseif action == "drop" then
+        --     global.tas.task = current_step[1]
+        --     global.tas.drop_position = current_step[3]
+        --     global.tas.drop_item = current_step[4]
+        --     return drop()
 
-    elseif action == "filter" then
-        global.tas.task_category = "filter"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        global.tas.slot = current_step[5]
-        global.tas.type = current_step[6]
-        return filter()
-
-    elseif action == "drop" then
-        global.tas.task = current_step[1]
-        global.tas.drop_position = current_step[3]
-        global.tas.drop_item = current_step[4]
-        return drop()
-
-    elseif action == "pick" then
-        global.tas.player.picking_state = true
-        return true
+        -- elseif action == "pick" then
+        --     global.tas.player.picking_state = true
+        --     return true
 
     elseif action == "idle" then
         character_config.idle = current_step[2]
@@ -145,45 +113,38 @@ local function doStep(character, character_config, current_step)
         global.tas.target_position = current_step[3]
         return launch()
 
-    elseif action == "next" then
-        global.tas.task_category = "next"
-        global.tas.task = current_step[1]
-        return Next()
+        -- elseif action == "next" then
+        --     global.tas.task_category = "next"
+        --     global.tas.task = current_step[1]
+        --     return Next()
 
-    elseif action == "shoot" then
-        global.tas.task_category = "shoot"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.amount = current_step[4]
-        return shoot()
+        -- elseif action == "shoot" then
+        --     global.tas.task_category = "shoot"
+        --     global.tas.task = current_step[1]
+        --     global.tas.target_position = current_step[3]
+        --     global.tas.amount = current_step[4]
+        --     return shoot()
 
-    elseif action == "throw" then
-        global.tas.task_category = "throw"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        global.tas.item = current_step[4]
-        return throw()
+        -- elseif action == "throw" then
+        --     global.tas.task_category = "throw"
+        --     global.tas.task = current_step[1]
+        --     global.tas.target_position = current_step[3]
+        --     global.tas.item = current_step[4]
+        --     return throw()
 
-    elseif action == "equip" then
-        global.tas.task_category = "equip"
-        global.tas.task = current_step[1]
-        global.tas.amount = current_step[3]
-        global.tas.item = current_step[4]
-        global.tas.slot = current_step[5]
-        return equip()
+        -- elseif action == "equip" then
+        --     global.tas.task_category = "equip"
+        --     global.tas.task = current_step[1]
+        --     global.tas.amount = current_step[3]
+        --     global.tas.item = current_step[4]
+        --     global.tas.slot = current_step[5]
+        --     return equip()
 
-    elseif action == "enter" then
-        global.tas.task_category = "enter"
-        global.tas.task = current_step[1]
-        return enter()
-
-    elseif action == "send" then
-        global.tas.task_category = "send"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        return send()
+        -- elseif action == "enter" then
+        --     global.tas.task_category = "enter"
+        --     global.tas.task = current_step[1]
+        --     return enter()
     end
-
 end
 
 local function update_mining(character, character_config, step)
@@ -258,7 +219,9 @@ local function handle_ontick(character, character_config, step)
             update_mining(character, character_config, step)
 
         elseif action ~= "walk" and action ~= "idle" and action ~= "mine" then
-            if doStep(character, character_config, step) then change_step(character_config) end
+            if doStep(character, character_config, step) then
+                change_step(character_config)
+            end
         end
     end
 end

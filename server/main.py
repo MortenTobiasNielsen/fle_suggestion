@@ -128,6 +128,8 @@ if __name__ == "__main__":
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "steam-engine", 2, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"take", {0.5, -7.5}, "offshore-pump", 2, defines.inventory.fuel})')
             data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"craft", "boiler", 2})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"craft", "boiler", 1, cancel = true})')
+            data10 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"research", "steel-axe", 1, cancel = true})')
 
             # data6 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 1, {"walk", {25, 15}})')
             # # data7 = rcon_client.send_command('/sc remote.call("AICommands", "add_step", 2, {"walk", {25, -15}})')

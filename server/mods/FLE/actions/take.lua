@@ -1,61 +1,6 @@
 local fle_utils = require("fle_utils")
 
-local take = {}
-
-function take.all(character, character_config, target_position, item,
-                  inventory_type)
-
-    if not fle_utils.check_selection_reach(character, character_config,
-                                           target_position) then return false end
-
-    if not fle_utils.check_inventory(character, character_config, inventory_type) then
-        return false;
-    end
-
-    local contents = character_config.target_inventory.get_contents()
-    for name, count in pairs(contents or character_config.target_inventory) do
-        local item_stack = character_config.target_inventory.find_item_stack(
-                               name)
-        if not item_stack then
-            Error("Item stack " .. item .. " not found for put")
-            return false
-        end
-
-        local health = item_stack.health
-        local durability = item_stack.is_tool and item_stack.durability or 1
-        local ammo = item_stack.is_ammo and item_stack.ammo or 10
-
-        local quantity = character.insert {
-            name = name,
-            health = health,
-            durability = durability,
-            ammo = ammo,
-            count = character_config.target_inventory.remove {
-                name = name,
-                count = count,
-                durability = durability
-            }
-        }
-
-        local text = string.format("+%d %s (%d)", quantity,
-                                   fle_utils.format_name(name),
-                                   character.get_item_count(name)) -- "+2 Iron plate (5)"
-        local position = {
-            x = character_config.target_inventory.entity_owner.position.x +
-                #text / 2 * global.font_size,
-            y = character_config.target_inventory.entity_owner.position.y
-        }
-        global.tas.player.play_sound {path = "utility/inventory_move"}
-        global.tas.player.create_local_flying_text {
-            text = text,
-            position = position
-        }
-    end
-
-    return true
-end
-
-function take.quantity(character, character_config, target_position, item,
+function take(character, character_config, target_position, item,
                        quantity, inventory_type)
 
     if not fle_utils.check_selection_reach(character, character_config,

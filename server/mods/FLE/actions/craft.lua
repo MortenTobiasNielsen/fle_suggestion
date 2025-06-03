@@ -1,4 +1,6 @@
-function craft(character, character_config, item, quantity)
+local craft = {}
+
+function craft.add(character, character_config, item, quantity)
 	if not character.force.recipes[item].enabled then
 		if(character_config.step_number > character_config.step_reached) then
 			-- Warning(string.format("Step: %s, Action: %s, Step: %d - Craft: It is not possible to craft %s - It needs to be researched first.", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
@@ -45,6 +47,29 @@ function craft(character, character_config, item, quantity)
 
         return false
 	end
+end
+
+function craft.cancel(character, character_config, item, quantity)
+	local queue = character.crafting_queue
+
+	for i = 1, #queue do
+		if queue[i].recipe == item then
+			if quantity == -1 then
+				character.cancel_crafting{index = i, count = 1000000}
+				-- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Cancel: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
+				return true
+			elseif queue[i].count >= quantity then
+				character.cancel_crafting{index = i, count = quantity}
+				-- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Cancel: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
+				return true
+			else
+				-- Warning(string.format("Step: %s, Action: %s, Step: %d - Cancel craft: It is not possible to cancel %s - Please check the script", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
+				return false
+			end
+		end
+	end
+	-- Warning(string.format("Step: %s, Action: %s, Step: %d - Cancel craft: It is not possible to cancel %s - Please check the script", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
+	return false
 end
 
 return craft
