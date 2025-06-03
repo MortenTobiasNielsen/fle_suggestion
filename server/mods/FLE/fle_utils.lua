@@ -3,7 +3,7 @@ local util = require("util")
 local fle_utils = {}
 
 function fle_utils.inventory_stats(inv)
-    if not inv then return nil end
+    if not inv or #inv == 0 then return nil end
     local slots = #inv
     local empty = inv.count_empty_stacks()
     local items = inv.get_contents()

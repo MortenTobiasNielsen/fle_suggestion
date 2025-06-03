@@ -1,16 +1,17 @@
 local json = require("dkjson")
 local fle_utils = require("fle_utils")
 
-local resources_data = {}
 local DECIMALS = 2
 
-function resources_data.get(cluster_radius)
+function resources_data()
     local all = global.fle.game_surface.find_entities_filtered {
         area = global.fle.area,
         type = {"resource", "tree"}
     }
 
-    local out = {trees = {}, resources = {}}
+    local data = {
+        tree = {}
+    }
 
     for _, entity in ipairs(all) do
         if entity.valid then
@@ -29,11 +30,11 @@ function resources_data.get(cluster_radius)
             }
 
             if entity.type == "tree" then
-                table.insert(out.trees, {selection_box = selection_box})
+                table.insert(data.tree, {selection_box = selection_box})
             else
                 local name = entity.name
-                out.resources[name] = out.resources[name] or {}
-                table.insert(out.resources[name], {
+                data[name] = data[name] or {}
+                table.insert(data[name], {
                     selection_box = selection_box,
                     amount = entity.amount,
                     yield = (name == "crude-oil") and
@@ -43,7 +44,7 @@ function resources_data.get(cluster_radius)
         end
     end
 
-    return json.encode(out)
+    return json.encode(data)
 end
 
 return resources_data

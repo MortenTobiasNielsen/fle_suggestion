@@ -1,10 +1,9 @@
 local json = require("dkjson")
 local fle_utils = require("fle_utils")
 
-local buildings_data = {}
 local DECIMALS = 2
 
-function buildings_data.get()
+function buildings_data()
     local wreck_names = {
         "crash-site-spaceship-wreck-big-1", "crash-site-spaceship-wreck-big-2",
         "crash-site-spaceship-wreck-medium-1",
@@ -33,24 +32,12 @@ function buildings_data.get()
     for n, c in pairs(defines.entity_status) do status_names[c] = n end
     for n, c in pairs(defines.direction) do direction_names[c] = n end
 
-    records = {}
+    data = {}
     for _, building in ipairs(buildings) do
         if building.valid and building.name ~= "character" then
-            -- compute exactly as before:
             local status = status_names[building.status] or "unknown"
             local direction = direction_names[building.direction or 0] or
                                   tostring(building.direction)
-
-            local inventory_stats = {
-                fuel = fle_utils.inventory_stats(building.get_fuel_inventory()),
-                input = fle_utils.inventory_stats(
-                    building.get_inventory(defines.inventory
-                                               .assembling_machine_input) or
-                        building.get_inventory(defines.inventory.lab_input)),
-                output = fle_utils.inventory_stats(
-                    building.get_output_inventory()),
-                mods = fle_utils.inventory_stats(building.get_module_inventory())
-            }
 
             local box = building.selection_box
             local left_top = box.left_top
@@ -66,21 +53,64 @@ function buildings_data.get()
                 {x = right_bottom_x, y = right_bottom_y}
             }
 
-            -- build one Lua table representing the whole entity
             local record = {
                 name = building.name,
                 position = {x = building.position.x, y = building.position.y},
                 selection_box = selection_box,
                 status = status,
-                direction = direction,
-                inventory = inventory_stats
+                direction = direction
             }
 
-            table.insert(records, record)
+            local inventory_stats = {}
+
+            -- Fuel inventory
+            local fuel_inventory = building.get_fuel_inventory()
+            if fuel_inventory then
+                inventory_stats.fuel = fle_utils.inventory_stats(fuel_inventory)
+            end
+
+            -- Input inventory (assembling machine or lab)
+            local input_inventory = building.get_inventory(defines.inventory
+                                                               .assembling_machine_input)
+            if not input_inventory then
+                input_inventory = building.get_inventory(defines.inventory
+                                                             .lab_input)
+            end
+            if input_inventory then
+                inventory_stats.input = fle_utils.inventory_stats(
+                                            input_inventory)
+            end
+
+            -- Output inventory
+            local output_inventory = building.get_output_inventory()
+            if output_inventory then
+                inventory_stats.output =
+                    fle_utils.inventory_stats(output_inventory)
+            end
+
+            -- Module inventory
+            local module_inventory = building.get_module_inventory()
+            if module_inventory then
+                inventory_stats.moduels = fle_utils.inventory_stats(
+                                           module_inventory)
+            end
+
+            -- Add inventory_stats to record if any inventories are present
+            if next(inventory_stats) then
+                record.inventory_stats = inventory_stats
+            end
+
+            -- Recipe information
+            if building.prototype.crafting_categories then
+                local recipe = building.get_recipe()
+                if recipe then record.recipe = recipe.name end
+            end
+
+            table.insert(data, record)
         end
     end
 
-    return json.encode(records)
+    return json.encode(data)
 end
 
 return buildings_data
