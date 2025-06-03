@@ -10,8 +10,7 @@ local buildings_data = require("data.buildings_data")
 local characters_data = require("data.characters_data")
 local electricity_data = require("data.electricity_data")
 local resources_data = require("data.resources_data")
-
-local DATA_CHUNK_SIZE = 1024
+local production_data = require("data.production_data")
 
 local function destroy_all_characters(surface)
     for _, entity in pairs(surface.find_entities_filtered {type = "character"}) do
@@ -224,10 +223,11 @@ remote.add_interface("AICommands", {
 
         rcon.print(reset_scenario(num_characters))
     end,
-    electricity_data = function() rcon.print(electricity_data.get()) end,
-    building_data = function() rcon.print(buildings_data.get()) end,
-    character_data = function() rcon.print(characters_data.get()) end,
-    resource_data = function() rcon.print(resources_data.get()) end,
+    electricity_data = function() rcon.print(electricity_data()) end,
+    building_data = function() rcon.print(buildings_data()) end,
+    character_data = function() rcon.print(characters_data()) end,
+    resource_data = function() rcon.print(resources_data()) end,
+    production_data = function() rcon.print(production_data()) end,
     add_step = function(character_index, step)
         rcon.print(add_step(character_index, step))
     end,
