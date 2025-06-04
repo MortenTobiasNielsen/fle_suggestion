@@ -59,9 +59,24 @@ function state(character_index, radius)
             local gun_stats = fle_utils.inventory_stats(gun_inv)
             local ammo_stats = fle_utils.inventory_stats(ammo_inv)
 
-            local step = {
-                total = #global.fle.character_configs[id].steps,
-                current = global.fle.character_configs[id].step_number
+            local steps = global.fle.character_configs[id].steps
+            local current = global.fle.character_configs[id].step_number
+            local total = #steps
+
+            local past_steps = {}
+            for i = 1, current - 1 do
+                table.insert(past_steps, steps[i])
+            end
+
+            local future_steps = {}
+            for i = current + 1, total do
+                table.insert(future_steps, steps[i])
+            end
+
+            local steps = {
+                past_steps = past_steps,
+                current_step = steps[current],
+                future_steps = future_steps
             }
 
             local record = {
@@ -72,7 +87,7 @@ function state(character_index, radius)
                     guns = gun_stats,
                     ammo = ammo_stats
                 },
-                step = step,
+                steps = steps,
                 walking_state = character.walking_state,
                 mining_state = character.mining_state,
                 mining_progress = character.character_mining_progress,
@@ -349,7 +364,7 @@ function state(character_index, radius)
                     research_unit_count = technology.research_unit_count,
                     research_unit_energy = technology.research_unit_energy,
                     ingredients = ingredients,
-                    effects = effects,
+                    effects = effects
                 }
 
                 if current_research and name == current_research.name then
