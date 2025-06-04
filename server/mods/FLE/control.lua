@@ -6,12 +6,9 @@ local util = require("util")
 
 local fle_utils = require("fle_utils")
 local handle_tick = require("handle_tick")
-local buildings_data = require("data.buildings_data")
-local characters_data = require("data.characters_data")
-local electricity_data = require("data.electricity_data")
-local resources_data = require("data.resources_data")
-local production_data = require("data.production_data")
-local research_data = require("data.research_data")
+local state = require("data.state")
+local meta_data = require("data.meta_data")
+local map_data = require("data.map_data")
 
 local function destroy_all_characters(surface)
     for _, entity in pairs(surface.find_entities_filtered {type = "character"}) do
@@ -68,11 +65,7 @@ script.on_event(defines.events.on_tick, function(event)
         local current_step_number = character_config.step_number
         local number_of_steps = #character_config.steps
 
-        -- if character_index == 1 then
-        --     game.print(string.format("Current_step_number: %d, Steps: %d",
-        --                              current_step_number, number_of_steps))
-        -- end
-
+        -- It seems like this could be the cause of the stuttering when a players is attached to a character, but I don't currently have a good fix.
         character.walking_state = {
             walking = false,
             direction = character_config.walking.direction
@@ -82,18 +75,6 @@ script.on_event(defines.events.on_tick, function(event)
             handle_tick.update(character, character_config)
 
             local current_step_number = character_config.step_number
-
-            if character_index == 1 then
-                -- game.print(string.format(
-                --                "Character %d: Position: (%.2f, %.2f), Walking: %s, Direction: %s, Current_step_number: %d,  Steps: %s, current step: %s",
-                --                character_index, character.position.x,
-                --                character.position.y, global.fle
-                --                    .character_configs[character_index].walking
-                --                    .walking, character_config.walking.direction,
-                --                current_step_number, character_config.steps,
-                --                character_config.steps[current_step_number]))
-            end
-
             character.walking_state = character_config.walking
         end
     end
@@ -123,51 +104,49 @@ function reset_scenario(num_characters)
     global.fle.characters = {}
 
     for i = 1, num_characters do
-        local char = global.fle.game_surface.create_entity {
+        local character = global.fle.game_surface.create_entity {
             name = "character",
             position = spawn_positions[i],
             force = game.forces.player
         }
 
-        if char and char.valid then
-            local inv = char.get_main_inventory()
+        if character and character.valid then
+            local inv = character.get_main_inventory()
             if inv then
                 inv.insert({name = "wood", count = 1})
                 inv.insert({name = "burner-mining-drill", count = 1})
                 inv.insert({name = "stone-furnace", count = 1})
             end
 
-            local guns_inv =
-                char.get_inventory(defines.inventory.character_guns)
+            local guns_inv = character.get_inventory(defines.inventory
+                                                         .character_guns)
             if guns_inv then
                 guns_inv.insert({name = "pistol", count = 1})
             end
 
-            local ammo_inv =
-                char.get_inventory(defines.inventory.character_ammo)
+            local ammo_inv = character.get_inventory(defines.inventory
+                                                         .character_ammo)
             if ammo_inv then
                 ammo_inv.insert({name = "firearm-magazine", count = 10})
             end
 
-            global.fle.characters[i] = char
-            global.fle.character_configs[i] = {}
-            global.fle.character_configs[i].character_index = i
-            global.fle.character_configs[i].walking = {
-                walking = false,
-                direction = defines.direction.north
+            global.fle.characters[i] = character
+            global.fle.character_configs[i] = {
+                character_index = i,
+                walking = {walking = false, direction = defines.direction.north},
+                destination = {
+                    x = character.position.x,
+                    y = character.position.y
+                },
+                steps = {},
+                step_number = 1,
+                step_reached = 1,
+                idle = 0,
+                idled = 0,
+                mining = 0,
+                ticks_mining = 0,
+                walk_towards = false
             }
-            global.fle.character_configs[i].destination = {
-                x = global.fle.characters[i].position.x,
-                y = global.fle.characters[i].position.y
-            }
-            global.fle.character_configs[i].steps = {}
-            global.fle.character_configs[i].step_number = 1
-            global.fle.character_configs[i].step_reached = 1
-            global.fle.character_configs[i].idle = 0
-            global.fle.character_configs[i].idled = 0
-            global.fle.character_configs[i].mining = 0
-            global.fle.character_configs[i].ticks_mining = 0
-            global.fle.character_configs[i].walk_towards = false
         end
     end
 
@@ -185,15 +164,13 @@ function reset_scenario(num_characters)
     return "Scenario reset with " .. num_characters .. " characters."
 end
 
-function execute_steps() 
-    game.tick_paused = false 
+function execute_steps()
+    game.tick_paused = false
     return "Steps set to be executed."
 end
 
 function add_steps(character_index, steps)
-    for i = 1, #steps do 
-        add_step(character_index, steps[i])
-    end
+    for i = 1, #steps do add_step(character_index, steps[i]) end
 
     return "Steps added successfully."
 end
@@ -229,12 +206,15 @@ remote.add_interface("AICommands", {
 
         rcon.print(reset_scenario(num_characters))
     end,
-    electricity_data = function() rcon.print(electricity_data()) end,
-    building_data = function() rcon.print(buildings_data()) end,
-    character_data = function() rcon.print(characters_data()) end,
-    resource_data = function() rcon.print(resources_data()) end,
-    production_data = function() rcon.print(production_data()) end,
-    research_data = function() rcon.print(research_data()) end,
+    state = function(character_index, radius)
+        rcon.print(state(character_index, radius))
+    end,
+    meta_data = function(character_index, radius)
+        rcon.print(meta_data(character_index, radius))
+    end,
+    map_data = function(character_index, radius)
+        rcon.print(map_data(character_index, radius))
+    end,
     add_step = function(character_index, step)
         rcon.print(add_step(character_index, step))
     end,
