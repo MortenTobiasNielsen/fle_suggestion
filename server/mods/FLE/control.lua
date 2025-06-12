@@ -155,7 +155,7 @@ function reset_scenario(num_characters)
 
     game.tick_paused = true
 
-    return "Scenario reset with " .. num_characters .. " characters."
+    return "Scenario reset with " .. num_characters .. " agents."
 end
 
 -- The intention is that the game with be paused when an agent either runs out of actions or runs into an error. Then once it thinks it has been fixed it can start executing actions again.
@@ -166,11 +166,11 @@ end
 
 function add_actions(character_id, actions)
     if not global.fle.characters[character_id] then
-        return "Character does not exist."
+        return "Agent does not exist."
     end
 
     local character = global.fle.characters[character_id]
-    if not character.valid then return "Character is invalid." end
+    if not character.valid then return "Agent is invalid." end
 
     for i = 1, #actions do
         table.insert(global.fle.character_configs[character_id].actions,
@@ -184,7 +184,7 @@ remote.add_interface("FLE", {
     reset = function(num_characters)
         if not num_characters or num_characters < 1 and num_characters > 9 then
             rcon.print(
-                "Invalid number of characters. Please specify a number between 1 and 9.")
+                "Invalid number of agents. Please specify a number between 1 and 9.")
         end
 
         rcon.print(reset_scenario(num_characters))

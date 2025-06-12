@@ -28,55 +28,74 @@ class CommunicationHandler:
     
     def send_actions(self) -> str:
         request = f'/sc remote.call("FLE", "add_actions", {self.agent_id}, '
-        request = request + "{"
-
+        request += "{"
         for action in self.actions:
-            request = request + action + "," 
-
-        request = request + "})"
-
+            request += action + ","
+        request = request[:-1]
+        request += "})"
+        
         return self.client.send_command(request)
 
     def get_data(self, data_Type: DataType, radius_to_search: int) -> str:
         return self._send_data_request(data_Type, radius_to_search)
     
-    def research(self, name: str, cancel: bool = False) -> str:
-        action = f'{{"research", "{name}", cancel = {self._bool(cancel)}}}'
+    def research(self, technology_name: str) -> str:
+        action = f'{{type = "research", technology_name = "{technology_name}"}}'
         self._add_action(action)
     
-    def walk(self, position: Position) -> str:
-        action = f'{{"walk", {position}}}'
-        self._add_action(action)
-    
-    def take(self, position: Position, name: str, quantity: int, inventory_type: InventoryType) -> str:
-        action = f'{{"take", {position}, "{name}", {quantity}, {inventory_type.value}}}'
-        self._add_action(action)
-    
-    def put(self, position: Position, name: str, quantity: int, inventory_type: InventoryType) -> str:
-        action = f'{{"put", {position}, "{name}", {quantity}, {inventory_type.value}}}'
-        self._add_action(action)
-    
-    def craft(self, name: str, quantity: int, cancel: bool = False) -> str:
-        action = f'{{"craft", "{name}", {quantity}, cancel = {self._bool(cancel)}}}'
+    def cancel_research(self) -> str:
+        action = f'{{type = "cancel_research"}}'
         self._add_action(action)
 
-    def build(self, position: Position, name: str, direction: Direction) -> str:
-        action = f'{{"build", {position}, "{name}", {direction.value}}}'
+    def walk(self, position: Position) -> str:
+        action = f'{{type = "walk", destination = {position}}}'
+        self._add_action(action)
+    
+    def take(self, position: Position, item_name: str, quantity: int, inventory_type: InventoryType) -> str:
+        action = f'{{type = "take", position = {position}, item_name = "{item_name}", quantity = {quantity}, inventory_type = {inventory_type.value}}}'
+        self._add_action(action)
+    
+    def put(self, position: Position, item_name: str, quantity: int, inventory_type: InventoryType) -> str:
+        action = f'{{type = "put", position = {position}, item_name = "{item_name}", quantity = {quantity}, inventory_type = {inventory_type.value}}}'
+        self._add_action(action)
+    
+    def craft(self, item_name: str, quantity: int) -> str:
+        action = f'{{type = "craft", item_name = "{item_name}", quantity = {quantity}}}'
+        self._add_action(action)
+
+    def cancel_craft(self, item_name: str, quantity: int) -> str:
+        action = f'{{type = "cancel_craft", item_name = "{item_name}", quantity = {quantity}}}'
+        self._add_action(action)
+
+    def build(self, position: Position, item_name: str, direction: Direction) -> str:
+        action = f'{{type = "build", position = {position}, item_name = "{item_name}", direction = {direction.value}}}'
         self._add_action(action)
     
     def rotate(self, position: Position, reverse: bool = False) -> str:
-        action = f'{{"rotate", {position}, {self._bool(reverse)}}}'
+        action = f'{{type = "rotate", position = {position}, reverse = {self._bool(reverse)}}}'
         self._add_action(action)
     
     def mine(self, position: Position, ticks: int) -> str:
-        action = f'{{"mine", {position}, {ticks}}}'
+        action = f'{{type = "mine", position = {position}, ticks = {ticks}}}'
         self._add_action(action)
     
-    def recipe(self, position: Position, name: str) -> str:
-        action = f'{{"recipe", {position}, "{name}"}}'
+    def recipe(self, position: Position, recipe_name: str) -> str:
+        action = f'{{type = "recipe", position = {position}, recipe_name = "{recipe_name}"}}'
         self._add_action(action)
     
     def wait(self, ticks: int) -> str:
-        action = f'{{"wait", {ticks}}}'
+        action = f'{{type = "wait", ticks = {ticks}}}'
+        self._add_action(action)
+
+    def drop(self, position: Position, item_name: str) -> str:
+        action = f'{{type = "drop", position = {position}, item_name = "{item_name}"}}'
+        self._add_action(action)
+    
+    def launch_rocket(self, position: Position) -> str:
+        action = f'{{type = "launch_rocket", position = {position}}}'
+        self._add_action(action)
+    
+    def pick_up(self, ticks: int) -> str:
+        action = f'{{type = "pick_up", ticks = {ticks}}}'
         self._add_action(action)
     
