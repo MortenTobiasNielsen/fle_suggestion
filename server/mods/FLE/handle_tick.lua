@@ -1,249 +1,197 @@
-local walk = require("actions.walk")
-local take = require("actions.take")
-local build = require("actions.build")
-local put = require("actions.put")
-local recipe = require("actions.recipe")
-local rotate = require("actions.rotate")
-local craft = require("actions.craft")
-local research = require("actions.research")
 local fle_utils = require("fle_utils")
 
-local handle_tick = {}
+local build = require("actions.build")
+local craft = require("actions.craft")
+local launch_rocket = require("actions.launch_rocket")
+local put = require("actions.put")
+local recipe = require("actions.recipe")
+local research = require("actions.research")
+local rotate = require("actions.rotate")
+local take = require("actions.take")
+local walk = require("actions.walk")
 
-local function change_step(character_config)
-    character_config.step_number = character_config.step_number + 1
+local function increment_action_number(character_config)
+    character_config.action_number = character_config.action_number + 1
 end
 
-local function update_walking(character, character_config, step)
-    local destination = fle_utils.to_position(step[2])
-
-    walk.update_destination_position(character_config, destination)
+local function update_walking(character, character_config, action)
+    walk.update_destination_position(character_config, action.destination)
     walk.find_walking_pattern(character, character_config)
 
-    character_config.walk_towards = step.walk_towards
-    character_config.walking = walk.update(character, character_config)
-    change_step(character_config)
+    character_config.walking_state = walk.update(character, character_config)
+    increment_action_number(character_config)
 end
 
-local function update_mining(character, character_config, step)
-    local position = fle_utils.to_position(step[2])
+local function update_mining(character, character_config, action)
+    local position = action.position
+
     character.update_selected_entity(position)
 
     character.mining_state = {mining = true, position = position}
 
-    character_config.duration = step[3]
-    character_config.ticks_mining = character_config.ticks_mining + 1
+    character_config.ticks_mined = character_config.ticks_mined + 1
 
-    if character_config.ticks_mining > character_config.duration then
-        change_step(character_config)
-        character_config.mining = 0
-        character_config.ticks_mining = 0
+    if character_config.ticks_mined > action.ticks then
+        increment_action_number(character_config)
+        character_config.ticks_mined = 0
         character.mining_state = {mining = false, position = position}
     end
 
-    character_config.mining = character_config.mining + 1
-    if character_config.mining > 5 then
+    -- This error state should be revisited when we are more clear about the action flow
+    character_config.tried_to_mine_for = character_config.tried_to_mine_for + 1
+    if character_config.tried_to_mine_for > 5 then
         if character.character_mining_progress == 0 then
-            rcon.print(string.format(
-                           "Step: %s, Action: %s: Cannot reach resource",
-                           character_config.step_number, action))
+            -- Meaningful error message
         else
-            character_config.mining = 0
+            character_config.tried_to_mine_for = 0
         end
     end
 end
 
-local function doStep(character, character_config, current_step)
+local function do_action(character, character_config, action)
 
-    global.vehicle = current_step.vehicle
-    global.wait_for_recipe = current_step.wait_for
-    global.cancel = current_step.cancel
+    local action_type = action.type
 
-    local action = current_step[1]
+    if action_type == "build" then
+        return build(character, character_config, action.position,
+                     action.item_name, action.direction)
+    end
 
-    if action == "craft" then
-        if current_step.cancel then
-            return craft.cancel(character, character_config, current_step[2],
-                                current_step[3])
-        else 
-            return craft.add(character, character_config, current_step[2],
-                             current_step[3])
-        end
-        
+    if action_type == "craft" then
+        return craft.add(character, character_config, action.item_name,
+                         action.quantity)
+    end
 
-    elseif action == "build" then
-        return build(character, character_config,
-                     fle_utils.to_position(current_step[2]), current_step[3],
-                     current_step[4])
+    if action_type == "cancel_craft" then
+        return craft.cancel(character, character_config, action.item_name,
+                            action.quantity)
+    end
 
-    elseif action == "take" then
-        return take(character, character_config,
-                    fle_utils.to_position(current_step[2]), current_step[3],
-                    current_step[4], current_step[5])
+    if action_type == "drop" then
+        return drop(character, character_config, action.position,
+                    action.item_name)
+    end
 
-    elseif action == "put" then
-        return put(character, character_config,
-                   fle_utils.to_position(current_step[2]), current_step[3],
-                   current_step[4], current_step[5])
+    if action_type == "launch_rocket" then
+        return launch_rocket(character, character_config, action.position)
+    end
 
-    elseif action == "rotate" then
-        return rotate(character, character_config, current_step[2],
-                      current_step[3])
+    if action_type == "put" then
+        return put(character, character_config, action.position,
+                   action.item_name, action.quantity)
+    end
 
-    elseif action == "research" then
-        return research(character, current_step[2], current_step.cancel)
+    if action_type == "recipe" then
+        return recipe(character, character_config, action.position,
+                      action.recipe_name)
+    end
 
-    elseif action == "cancel_research" then
+    if action_type == "research" then
+        return research(character, action.technology_name)
+    end
+
+    if action_type == "cancel_research" then
         character.force.research_queue = {}
+    end
 
-    elseif action == "recipe" then
-        return recipe(character, character_config,
-                      fle_utils.to_position(current_step[2]), current_step[3])
+    if action_type == "rotate" then
+        return rotate(character, character_config, action.position,
+                      action.reverse)
+    end
 
-        -- elseif action == "limit" then
-        --     global.tas.task_category = "limit"
-        --     global.tas.task = current_step[1]
-        --     global.tas.target_position = current_step[3]
-        --     global.tas.amount = current_step[4]
-        --     global.tas.slot = current_step[5]
-        --     return limit()
+    if action_type == "take" then
+        return take(character, character_config, action.position,
+                    action.item_name, action.quantity)
+    end
 
-        -- elseif action == "priority" then
-        --     global.tas.task_category = "priority"
-        --     global.tas.task = current_step[1]
-        --     global.tas.target_position = current_step[3]
-        --     global.tas.input = current_step[4]
-        --     global.tas.output = current_step[5]
-        --     return priority()
-
-        -- elseif action == "filter" then
-        --     global.tas.task_category = "filter"
-        --     global.tas.task = current_step[1]
-        --     global.tas.target_position = current_step[3]
-        --     global.tas.item = current_step[4]
-        --     global.tas.slot = current_step[5]
-        --     global.tas.type = current_step[6]
-        --     return filter()
-
-        -- elseif action == "drop" then
-        --     global.tas.task = current_step[1]
-        --     global.tas.drop_position = current_step[3]
-        --     global.tas.drop_item = current_step[4]
-        --     return drop()
-
-        -- elseif action == "pick" then
-        --     global.tas.player.picking_state = true
-        --     return true
-
-    elseif action == "wait" then
-        character_config.wait = current_step[2]
+    if action_type == "pick_up" then
+        character_config.pickup_ticks = character_config.pickup_ticks +
+                                            action.ticks - 1
+        character.picking_state = true
         return true
+    end
 
-    elseif action == "launch" then
-        global.tas.task_category = "launch"
-        global.tas.task = current_step[1]
-        global.tas.target_position = current_step[3]
-        return launch()
-
-        -- elseif action == "next" then
-        --     global.tas.task_category = "next"
-        --     global.tas.task = current_step[1]
-        --     return Next()
-
-        -- elseif action == "shoot" then
-        --     global.tas.task_category = "shoot"
-        --     global.tas.task = current_step[1]
-        --     global.tas.target_position = current_step[3]
-        --     global.tas.amount = current_step[4]
-        --     return shoot()
-
-        -- elseif action == "throw" then
-        --     global.tas.task_category = "throw"
-        --     global.tas.task = current_step[1]
-        --     global.tas.target_position = current_step[3]
-        --     global.tas.item = current_step[4]
-        --     return throw()
-
-        -- elseif action == "equip" then
-        --     global.tas.task_category = "equip"
-        --     global.tas.task = current_step[1]
-        --     global.tas.amount = current_step[3]
-        --     global.tas.item = current_step[4]
-        --     global.tas.slot = current_step[5]
-        --     return equip()
-
-        -- elseif action == "enter" then
-        --     global.tas.task_category = "enter"
-        --     global.tas.task = current_step[1]
-        --     return enter()
+    if action_type == "wait" then
+        character_config.wait = action.ticks
+        return true
     end
 end
 
-local function handle_pretick(character, character_config, steps)
+local function handle_pretick(character, character_config, actions)
     while true do
-        local step = steps[character_config.step_number]
+        local action = actions[character_config.action_number]
 
-        if step == nil then
-            return -- no more steps to handle
-        elseif (step[1] == "walk" and
-            (character_config.walking.walking == false or
-                character_config.walk_towards) and character_config.wait < 1) then
+        if action == nil then
+            return -- no more actions to handle (pause game?)
+        end
 
-            update_walking(character, character_config, step)
+        local action_type = action.type
+
+        if (action_type == "walk" and character_config.walking_state.walking ==
+            false and character_config.wait < 1) then
+
+            update_walking(character, character_config, action)
+
+        elseif action_type == "pick_up" then
+            character_config.pickup_ticks =
+                character_config.pickup_ticks + action.ticks - 1
+            character.picking_state = true
+            increment_action_number(character_config)
+
         else
-            return -- no more to do, break loop
+            return -- action is not a pretick action, break loop
         end
     end
 end
 
-local function handle_ontick(character, character_config, step)
-    local action = step[1]
+local function handle_ontick(character, character_config, action)
+    if character.pickup_ticks > 0 then
+        character.picking_state = true
+        character.pickup_ticks = character.pickup_ticks - 1
+    end
 
-    if character_config.walking.walking == false then
+    local action_type = action.type
+
+    if character_config.walking_state.walking == false then
         if character_config.wait > 0 then
             character_config.wait = character_config.wait - 1
-            character_config.waited = character_config.waited + 1
 
             if character_config.wait == 0 then
-                character_config.waited = 0
-
-                if action == "walk" then
-                    update_walking(character, character_config, step)
+                if action_type == "walk" then
+                    update_walking(character, character_config, action)
                 end
             end
-        elseif action == "walk" then
-            update_walking(character, character_config, step)
+        elseif action_type == "walk" then
+            update_walking(character, character_config, action)
 
-        elseif action == "mine" then
-            update_mining(character, character_config, step)
+        elseif action_type == "mine" then
+            update_mining(character, character_config, action)
 
-        elseif doStep(character, character_config, step) then
-            change_step(character_config)
+        elseif do_action(character, character_config, action) then
+            increment_action_number(character_config)
         end
     else
-        if global.walk_towards_state and action == "mine" then
-            update_mining(character, character_config, step)
-
-        elseif action ~= "walk" and action ~= "wait" and action ~= "mine" then
-            if doStep(character, character_config, step) then
-                change_step(character_config)
+        if action_type ~= "walk" and action_type ~= "wait" and action_type ~=
+            "mine" then
+            if do_action(character, character_config, action) then
+                increment_action_number(character_config)
             end
         end
     end
 end
 
-function handle_tick.update(character, character_config)
-    character_config.walking = walk.update(character, character_config)
+function handle_tick(character, character_config)
+    character_config.walking_state = walk.update(character, character_config)
 
-    local steps = character_config.steps
-    handle_pretick(character, character_config, steps)
+    local actions = character_config.actions
+    handle_pretick(character, character_config, actions)
 
-    local step = steps[character_config.step_number]
-    if step == nil then
-        return -- no more steps to handle
+    local action = actions[character_config.action_number]
+    if action == nil then
+        return -- no more actions to handle (pause game?)
     end
 
-    handle_ontick(character, character_config, step)
+    handle_ontick(character, character_config, action)
 end
 
 return handle_tick

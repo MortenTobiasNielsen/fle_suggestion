@@ -57,23 +57,23 @@ end)
 script.on_event(defines.events.on_tick, function(event)
     if not global.fle.characters then return end
 
-    for character_index, character in pairs(global.fle.characters) do
-        local character_config = global.fle.character_configs[character_index]
+    for character_id, character in pairs(global.fle.characters) do
+        local character_config = global.fle.character_configs[character_id]
 
-        local current_step_number = character_config.step_number
-        local number_of_steps = #character_config.steps
+        local current_action_number = character_config.action_number
+        local number_of_actions = #character_config.actions
 
         -- It seems like this could be the cause of the stuttering when a players is attached to a character, but I don't currently have a good fix.
         character.walking_state = {
             walking = false,
-            direction = character_config.walking.direction
+            direction = character_config.walking_state.direction
         }
 
-        if current_step_number <= number_of_steps then
+        if current_action_number <= number_of_actions then
             handle_tick.update(character, character_config)
 
-            local current_step_number = character_config.step_number
-            character.walking_state = character_config.walking
+            local current_action_number = character_config.action_number
+            character.walking_state = character_config.walking_state
         end
     end
 end)
@@ -130,20 +130,16 @@ function reset_scenario(num_characters)
 
             global.fle.characters[i] = character
             global.fle.character_configs[i] = {
-                character_index = i,
-                walking = {walking = false, direction = defines.direction.north},
-                destination = {
-                    x = character.position.x,
-                    y = character.position.y
-                },
-                steps = {},
-                step_number = 1,
-                step_reached = 1,
+                character_id = i,
+                walking_state = {walking = false, direction = defines.direction.north},
+                destination = character.position,
+                actions = {},
+                action_number = 1,
+                action_reached = 1,
                 wait = 0,
-                waited = 0,
-                mining = 0,
-                ticks_mining = 0,
-                walk_towards = false
+                pickup_ticks = 0,
+                ticks_mined = 0,
+                tried_to_mine_for = 0,
             }
         end
     end
@@ -162,29 +158,26 @@ function reset_scenario(num_characters)
     return "Scenario reset with " .. num_characters .. " characters."
 end
 
-function execute_steps()
+-- The intention is that the game with be paused when an agent either runs out of actions or runs into an error. Then once it thinks it has been fixed it can start executing actions again.
+function execute_actions()
     game.tick_paused = false
-    return "Steps set to be executed."
+    return "Actions set to be executed."
 end
 
-function add_steps(character_index, steps)
-    for i = 1, #steps do add_step(character_index, steps[i]) end
-    return "Steps added successfully."
-end
-
-function add_step(character_index, step)
-    if not global.fle.characters[character_index] then
+function add_actions(character_id, actions)
+    if not global.fle.characters[character_id] then
         return "Character does not exist."
     end
 
-    local character = global.fle.characters[character_index]
-    if not character.valid then
-        return "Character is invalid."
+    local character = global.fle.characters[character_id]
+    if not character.valid then return "Character is invalid." end
+
+    for i = 1, #actions do
+        table.insert(global.fle.character_configs[character_id].actions,
+                     actions[i])
     end
 
-    table.insert(global.fle.character_configs[character_index].steps, step)
-
-    return "Step added successfully."
+    return "Actions added successfully."
 end
 
 remote.add_interface("FLE", {
@@ -196,19 +189,19 @@ remote.add_interface("FLE", {
 
         rcon.print(reset_scenario(num_characters))
     end,
-    state_data = function(character_index, radius)
-        rcon.print(state_data(character_index, radius))
+    state_data = function(character_id, radius)
+        rcon.print(state_data(character_id, radius))
     end,
-    meta_data = function(character_index, radius)
-        rcon.print(meta_data(character_index, radius))
+    meta_data = function(character_id, radius)
+        rcon.print(meta_data(character_id, radius))
     end,
-    map_data = function(character_index, radius)
-        rcon.print(map_data(character_index, radius))
+    map_data = function(character_id, radius)
+        rcon.print(map_data(character_id, radius))
     end,
-    add_steps = function(character_index, steps)
-        rcon.print(add_steps(character_index, steps))
+    add_actions = function(character_id, actions)
+        rcon.print(add_actions(character_id, actions))
     end,
-    execute_steps = function() rcon.print(execute_steps()) end
+    execute_actions = function() rcon.print(execute_actions()) end
 })
 
 commands.add_command("flip",

@@ -9,7 +9,8 @@ function walk.update_destination_position(character_config, destination)
     character_config.keep_y = false
     character_config.diagonal = false
 
-    if math.abs(destination.x - last_destination.x) == math.abs(destination.y - last_destination.y) then
+    if math.abs(destination.x - last_destination.x) ==
+        math.abs(destination.y - last_destination.y) then
         character_config.diagonal = true
     elseif diff_x == 0 then
         character_config.keep_x = true
@@ -218,7 +219,7 @@ function walk.update(character, character_config)
     local diagonal = character_config.diagonal
     local character_position = character.position
     local destination = character_config.destination
-    local current_direction = character_config.walking.direction
+    local current_direction = character_config.walking_state.direction
 
     if character_config.pos_pos then
         return walk_pos_pos(keep_x, keep_y, diagonal, character_position,

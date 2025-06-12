@@ -1,6 +1,6 @@
-function research(character, name)
+function research(character, technology_name)
     local force = character.force
-    local technology = force.technologies[name]
+    local technology = force.technologies[technology_name]
 
     if not technology then
         -- Meaningful error message
@@ -17,7 +17,7 @@ function research(character, name)
         return false
     end
 
-    local success = force.add_research(name)
+    local success = force.add_research(technology_name)
     if not success then
         -- Meaningful error message
         return false

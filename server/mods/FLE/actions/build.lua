@@ -1,10 +1,10 @@
 local fle_utils = require("fle_utils")
 
 local function create_entity_replace(character, character_config,
-                                     target_position, item, direction)
+                                     target_position, item_name, direction)
 
     local stack, stack_location = character.get_inventory(1).find_item_stack(
-                                      item)
+                                      item_name)
     if not stack or not stack.valid then
         -- Meaningful error message
         return false
@@ -24,7 +24,7 @@ local function create_entity_replace(character, character_config,
     }
 
     local created_entity = global.fle.game_surface.create_entity {
-        name = item,
+        name = item_name,
         position = target_position,
         direction = direction,
         force = "player",
@@ -57,7 +57,7 @@ local function create_entity_replace(character, character_config,
         end
 
         if (not neighbour_position) then
-            character.remove_item({name = item, count = 1})
+            character.remove_item({name = item_name, count = 1})
             return true
         end
 
@@ -121,7 +121,7 @@ local function create_entity_replace(character, character_config,
             end
         end
 
-        character.remove_item({name = item, count = 1})
+        character.remove_item({name = item_name, count = 1})
         return true
     end
 
@@ -135,19 +135,20 @@ local function create_entity_replace(character, character_config,
 
         created_entity.health = stack.health * created_entity.health
 
-        character.remove_item({name = item, count = 1})
+        character.remove_item({name = item_name, count = 1})
     end
 
     return created_entity ~= nil
 end
 
-function build(character, character_config, target_position, item, direction)
-    local is_curved_rail = item == "curved_rail"
-    local count = character.get_item_count(item)
+function build(character, character_config, target_position, item_name,
+               direction)
+    local is_curved_rail = item_name == "curved_rail"
+    local count = character.get_item_count(item_name)
 
     if count < 1 then
         if (character_config.step_number > character_config.step_reached) then
-            if character_config.walking.walking == false then
+            if character_config.walking_state.walking == false then
                 -- Meaningful error message
                 character_config.step_reached = character_config.step_number
             end
@@ -156,25 +157,28 @@ function build(character, character_config, target_position, item, direction)
         return false
     end
 
-    if (item ~= "rail") then
-        if fle_utils.item_is_tile(item) then
+    if (item_name ~= "rail") then
+        if fle_utils.item_is_tile(item_name) then
             if fle_utils.is_within_range() then
-                if item == "stone-brick" then
+                if item_name == "stone-brick" then
                     global.fle.game_surface.set_tiles({
                         {position = target_position, name = "stone-path"}
                     })
-                elseif (item == "hazard-concrete") or
-                    (item == "refined-hazard-concrete") then
+                elseif (item_name == "hazard-concrete") or
+                    (item_name == "refined-hazard-concrete") then
                     global.fle.game_surface.set_tiles({
-                        {position = target_position, name = item .. "-left"}
+                        {
+                            position = target_position,
+                            name = item_name .. "-left"
+                        }
                     })
                 else
                     global.fle.game_surface.set_tiles({
-                        {position = target_position, name = item}
+                        {position = target_position, name = item_name}
                     })
                 end
 
-                if (item == "landfill") then
+                if (item_name == "landfill") then
                     global.fle.game_surface.play_sound {
                         path = "tile-build-small/landfill",
                         position = target_position
@@ -186,7 +190,7 @@ function build(character, character_config, target_position, item, direction)
                     }
                 end
 
-                character.remove_item({name = item, count = 1})
+                character.remove_item({name = item_name, count = 1})
                 return true
             end
 
@@ -194,18 +198,18 @@ function build(character, character_config, target_position, item, direction)
 
         elseif fle_utils.is_within_range(character, target_position) and
             (global.fle.game_surface.can_place_entity {
-                name = item,
+                name = item_name,
                 position = target_position,
                 direction = direction,
                 build_check_type = defines.build_check_type.ghost_revive
             } or global.fle.game_surface.can_fast_replace {
-                name = item,
+                name = item_name,
                 position = target_position,
                 direction = direction,
                 force = character.force
             }) then
             return create_entity_replace(character, character_config,
-                                         target_position, item, direction)
+                                         target_position, item_name, direction)
         else
             return false
         end
@@ -213,19 +217,19 @@ function build(character, character_config, target_position, item, direction)
 
         if fle_utils.is_within_range(character, target_position) and
             global.fle.game_surface.can_place_entity {
-                name = item,
+                name = item_name,
                 position = target_position,
                 direction = direction
             } then
 
             if global.fle.game_surface.create_entity {
-                name = item,
+                name = item_name,
                 position = target_position,
                 direction = direction,
                 force = "player",
                 raise_built = true
             } then
-                character.remove_item({name = item, count = 1})
+                character.remove_item({name = item_name, count = 1})
                 return true
             end
 

@@ -47,8 +47,8 @@ local function valid_position(surface, position)
     return false
 end
 
-function map_data(character_index, radius)
-    local character = global.fle.characters[character_index]
+function map_data(character_id, radius)
+    local character = global.fle.characters[character_id]
     local force = character.force
     local surface = character.surface
 

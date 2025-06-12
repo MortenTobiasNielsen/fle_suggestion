@@ -14,7 +14,7 @@ local status_names, direction_names = {}, {}
 for n, c in pairs(defines.entity_status) do status_names[c] = n end
 for n, c in pairs(defines.direction) do direction_names[c] = n end
 
-function state_data(character_index, radius)
+function state_data(character_id, radius)
     local characters = global.fle.characters
     if not characters or #characters == 0 then
         return json.encode({
@@ -22,12 +22,13 @@ function state_data(character_index, radius)
         })
     end
 
-    local character = global.fle.characters[character_index]
+    local character = global.fle.characters[character_id]
     local force = character.force
     local surface = character.surface
 
+    -- This is intended for external use, we therefore use agents instead of characters.
     local state = {
-        characters = {},
+        agents = {},
         buildings = {},
         electricity = {},
         flow = {production = {}, consumption = {}},
@@ -35,7 +36,7 @@ function state_data(character_index, radius)
     }
 
     ---------------------------------------------------------------------------
-    -- Characters
+    -- Agents
     ---------------------------------------------------------------------------
 
     -- This needs to be changed to be force specific when the team config is settled.
@@ -80,17 +81,14 @@ function state_data(character_index, radius)
             local prototype = character.prototype
 
             local record = {
-                character_index = id,
+                agent_id = id,
                 position = position,
                 inventory = {
                     main = main_stats,
                     guns = gun_stats,
                     ammo = ammo_stats
                 },
-                walking = {
-                    is_walking = character.walking_state.walking,
-                    direction = character.walking_state.direction
-                },
+                walking_state =character.walking_state.walking,
                 mining = {
                     speed = prototype.mining_speed * 1 +
                         character.character_mining_speed_modifier,
@@ -106,7 +104,7 @@ function state_data(character_index, radius)
                 steps = steps
             }
 
-            table.insert(state.characters, record)
+            table.insert(state.agents, record)
         end
     end
 

@@ -2,8 +2,8 @@ local json = require("include.dkjson")
 local fle_utils = require("fle_utils")
 local DECIMALS = 2
 
-function meta_data(character_index, radius)
-    local character = global.fle.characters[character_index]
+function meta_data(character_id, radius)
+    local character = global.fle.characters[character_id]
     local force = character.force
     local surface = character.surface
 

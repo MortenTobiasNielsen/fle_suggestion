@@ -1,6 +1,6 @@
 local fle_utils = require("fle_utils")
 
-function take(character, character_config, target_position, item, quantity,
+function take(character, character_config, target_position, item_name, quantity,
               inventory_type)
 
     local can_reach = fle_utils.check_selection_reach(character,
@@ -15,12 +15,12 @@ function take(character, character_config, target_position, item, quantity,
     end
 
     local removalable_items = character_config.target_inventory.get_item_count(
-                                  item)
+                                  item_name)
     local insertable_items = character.get_main_inventory()
-                                 .get_insertable_count(item)
+                                 .get_insertable_count(item_name)
 
     if removalable_items == 0 then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -28,7 +28,7 @@ function take(character, character_config, target_position, item, quantity,
     end
 
     if insertable_items == 0 then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -40,7 +40,7 @@ function take(character, character_config, target_position, item, quantity,
     end
 
     if quantity > removalable_items or quantity > insertable_items then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -50,7 +50,7 @@ function take(character, character_config, target_position, item, quantity,
     local moved = 0
     while quantity > moved do
         local item_stack = character_config.target_inventory.find_item_stack(
-                               item)
+                               item_name)
         if not item_stack then
             -- Meaningful error message
             return false
@@ -65,12 +65,12 @@ function take(character, character_config, target_position, item, quantity,
         stack_count = stack_count < remaining and stack_count or remaining
 
         if stack_count ~= character.insert {
-            name = item,
+            name = item_name,
             durability = durability,
             health = health,
             ammo = ammo,
             count = character_config.target_inventory.remove {
-                name = item,
+                name = item_name,
                 count = stack_count,
                 durability = durability,
                 health = health,
@@ -92,8 +92,8 @@ function take(character, character_config, target_position, item, quantity,
     local player = character.player
     if player then
         local text = string.format("+%d %s (%d)", quantity,
-                                   fle_utils.format_name(item),
-                                   character.get_item_count(item)) -- "+2 Iron plate (5)"
+                                   fle_utils.format_name(item_name),
+                                   character.get_item_count(item_name)) -- "+2 Iron plate (5)"
         local pos = {
             x = character_config.target_inventory.entity_owner.position.x +
                 #text / 2 * global.font_size,

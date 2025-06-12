@@ -25,7 +25,7 @@ function fle_utils.check_selection_reach(character, character_config,
     character.update_selected_entity(target_position)
 
     if not character.selected then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -33,7 +33,7 @@ function fle_utils.check_selection_reach(character, character_config,
     end
 
     if not character.can_reach_entity(character.selected) then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -49,7 +49,7 @@ function fle_utils.check_inventory(character, character_config, inventory_type)
                                             character.selected.get_inventory(1)
 
     if not character_config.target_inventory then
-        if not character_config.walking.walking then
+        if not character_config.walking_state.walking then
             -- Meaningful error message
         end
 
@@ -57,11 +57,6 @@ function fle_utils.check_inventory(character, character_config, inventory_type)
     end
 
     return true
-end
-
-function fle_utils.to_position(position)
-    if not position then return nil end
-    return {x = position[1], y = position[2]}
 end
 
 function fle_utils.format_name(str)
