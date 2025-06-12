@@ -2,9 +2,9 @@ local craft = {}
 
 function craft.add(character, character_config, item_name, quantity)
     if not character.force.recipes[item_name].enabled then
-        if (character_config.step_number > character_config.step_reached) then
+        if (character_config.action_number > character_config.action_reached) then
             -- Meaningful error message
-            character_config.step_reached = character_config.step_number
+            character_config.action_reached = character_config.action_number
         end
 
         return false;
@@ -29,9 +29,9 @@ function craft.add(character, character_config, item_name, quantity)
             return false
         end
     else
-        if (character_config.step_number > character_config.step_reached) then
+        if (character_config.action_number > character_config.action_reached) then
             -- Meaningful error message
-            character_config.step_reached = character_config.step_number
+            character_config.action_reached = character_config.action_number
         end
 
         return false

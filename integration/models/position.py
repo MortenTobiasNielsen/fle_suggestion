@@ -6,4 +6,4 @@ class Position:
     y: float
 
     def __str__(self) -> str:
-        return f"{{{self.x},{self.y}}}"
+        return f"{{x = {self.x}, y = {self.y}}}"

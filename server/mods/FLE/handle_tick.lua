@@ -78,7 +78,7 @@ local function do_action(character, character_config, action)
 
     if action_type == "put" then
         return put(character, character_config, action.position,
-                   action.item_name, action.quantity)
+                   action.item_name, action.quantity, action.inventory_type)
     end
 
     if action_type == "recipe" then
@@ -92,6 +92,7 @@ local function do_action(character, character_config, action)
 
     if action_type == "cancel_research" then
         character.force.research_queue = {}
+        return true
     end
 
     if action_type == "rotate" then
@@ -101,7 +102,7 @@ local function do_action(character, character_config, action)
 
     if action_type == "take" then
         return take(character, character_config, action.position,
-                    action.item_name, action.quantity)
+                    action.item_name, action.quantity, action.inventory_type)
     end
 
     if action_type == "pick_up" then
@@ -145,12 +146,14 @@ local function handle_pretick(character, character_config, actions)
 end
 
 local function handle_ontick(character, character_config, action)
-    if character.pickup_ticks > 0 then
+    if character_config.pickup_ticks > 0 then
         character.picking_state = true
-        character.pickup_ticks = character.pickup_ticks - 1
+        character_config.pickup_ticks = character_config.pickup_ticks - 1
     end
 
     local action_type = action.type
+
+    log(action_type)
 
     if character_config.walking_state.walking == false then
         if character_config.wait > 0 then

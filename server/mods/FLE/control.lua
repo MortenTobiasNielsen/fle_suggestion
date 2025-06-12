@@ -70,7 +70,7 @@ script.on_event(defines.events.on_tick, function(event)
         }
 
         if current_action_number <= number_of_actions then
-            handle_tick.update(character, character_config)
+            handle_tick(character, character_config)
 
             local current_action_number = character_config.action_number
             character.walking_state = character_config.walking_state
@@ -155,7 +155,11 @@ function reset_scenario(num_characters)
 
     game.tick_paused = true
 
-    return "Scenario reset with " .. num_characters .. " agents."
+    if num_characters > 1 then
+        return "Scenario reset with " .. num_characters .. " agents."
+    else
+        return "Scenario reset with " .. num_characters .. " agent."
+    end
 end
 
 -- The intention is that the game with be paused when an agent either runs out of actions or runs into an error. Then once it thinks it has been fixed it can start executing actions again.
@@ -172,9 +176,16 @@ function add_actions(character_id, actions)
     local character = global.fle.characters[character_id]
     if not character.valid then return "Agent is invalid." end
 
+    -- Log the actions being added to server log
+    log("Adding " .. #actions .. " actions to character " .. character_id)
+    
     for i = 1, #actions do
+        local action = actions[i]
+        -- Log each individual action to server log
+        log("Character " .. character_id .. " action " .. i .. ": " .. json.encode(action))
+        
         table.insert(global.fle.character_configs[character_id].actions,
-                     actions[i])
+                     action)
     end
 
     return "Actions added successfully."

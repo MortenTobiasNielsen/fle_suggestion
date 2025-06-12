@@ -147,10 +147,10 @@ function build(character, character_config, target_position, item_name,
     local count = character.get_item_count(item_name)
 
     if count < 1 then
-        if (character_config.step_number > character_config.step_reached) then
+        if (character_config.action_number > character_config.action_reached) then
             if character_config.walking_state.walking == false then
                 -- Meaningful error message
-                character_config.step_reached = character_config.step_number
+                character_config.action_reached = character_config.action_number
             end
         end
 

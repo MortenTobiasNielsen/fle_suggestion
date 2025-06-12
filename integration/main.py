@@ -175,7 +175,7 @@ class FLE:
 
 if __name__ == "__main__":
     IMAGE = "factorio_0.2.0"
-    SCENARIO_NAME = "FLE_Lab_Easy"
+    SCENARIO_NAME = "FLE_Lab"
     INSTANCE_COUNT = 1
 
     cmd = ["bash", "../server/image_check.sh", IMAGE]
@@ -219,9 +219,11 @@ if __name__ == "__main__":
         rcon_client = RCONClient("127.0.0.1", 27015, "factorio")
         communication_handler = CommunicationHandler(rcon_client, 1)
 
-        data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 1)')
+        data1 = rcon_client.send_command('/sc remote.call("FLE", "reset", 1)')
         
         steps_path = os.path.join(os.path.dirname(__file__), "steps_lab.lua")
+        communication_handler.research("steel-axe")
+        communication_handler.cancel_research()
         communication_handler.research("steel-axe")
         communication_handler.take(Position(0.5, -7.5), "coal", 500, InventoryType.CHEST)
         communication_handler.take(Position(0.5, -7.5), "burner-mining-drill", 50, InventoryType.CHEST)
@@ -237,19 +239,18 @@ if __name__ == "__main__":
         communication_handler.take(Position(0.5, -7.5), "inserter", 50, InventoryType.CHEST)
         communication_handler.take(Position(0.5, -7.5), "burner-inserter", 50, InventoryType.CHEST)
         communication_handler.take(Position(0.5, -7.5), "wooden-chest", 10, InventoryType.CHEST)
-        communication_handler.take(Position(0.5, -7.5), "boiler", 2, InventoryType.CHEST)
+        # communication_handler.take(Position(0.5, -7.5), "boiler", 2, InventoryType.CHEST)
         communication_handler.take(Position(0.5, -7.5), "steam-engine", 2, InventoryType.CHEST)
         communication_handler.take(Position(0.5, -7.5), "offshore-pump", 2, InventoryType.CHEST)
+        communication_handler.craft("boiler", 2)
+        communication_handler.cancel_craft("boiler", 1)
         step_parser = StepParser(steps_path, communication_handler)
         step_parser.parse()
-    #     communication_handler.walk(Position(30.0, -20.0))
-    #     communication_handler.mine(Position(30.5, -20.5), 121)
-    #     communication_handler.walk(Position(0.0, 0.0))
         data2 = communication_handler.get_data(DataType.STATE, 150)
         data3 = communication_handler.get_data(DataType.META, 150)
         data4 = communication_handler.get_data(DataType.MAP, 150)
 
-        data5 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
+        data5 = rcon_client.send_command('/sc remote.call("FLE", "execute_actions")')
         data6 = communication_handler.get_data(DataType.STATE, 150)
 
         meta = json.loads(data3)

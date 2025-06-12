@@ -7,7 +7,6 @@ function take(character, character_config, target_position, item_name, quantity,
                                                       character_config,
                                                       target_position)
 
-    game.print(can_reach)
     if not can_reach then return false end
 
     if not fle_utils.check_inventory(character, character_config, inventory_type) then

@@ -211,7 +211,7 @@ class StepParser:
                         else:
                             test = 1
 
-                self.communication_handler.send_steps()
+                self.communication_handler.send_actions()
         else:
             return "Path doesn't exist."
         

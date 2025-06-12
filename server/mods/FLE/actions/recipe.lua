@@ -5,9 +5,9 @@ function recipe(character, character_config, target_position, item_name)
                                            target_position) then return false end
 
     if item_name ~= "none" and not character.force.recipes[item_name].enabled then
-        if (character_config.step_number > character_config.step_reached) then
+        if (character_config.action_number > character_config.action_reached) then
             -- Meaningful error message
-            character_config.step_reached = character_config.step_number
+            character_config.action_reached = character_config.action_number
         end
 
         return false;
@@ -15,7 +15,7 @@ function recipe(character, character_config, target_position, item_name)
 
     if character.selected.crafting_progress ~= 0 then
         -- Meaningful error message
-        character_config.step_reached = character_config.step_number
+        character_config.action_reached = character_config.action_number
         return false
     end
 

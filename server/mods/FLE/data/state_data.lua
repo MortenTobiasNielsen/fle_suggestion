@@ -58,24 +58,24 @@ function state_data(character_id, radius)
             local gun_stats = fle_utils.inventory_stats(gun_inv)
             local ammo_stats = fle_utils.inventory_stats(ammo_inv)
 
-            local steps = global.fle.character_configs[id].steps
-            local current = global.fle.character_configs[id].step_number
-            local total = #steps
+            local actions = global.fle.character_configs[id].actions
+            local current = global.fle.character_configs[id].action_number
+            local total = #actions
 
-            local past_steps = {}
+            local past_actions = {}
             for i = 1, current - 1 do
-                table.insert(past_steps, steps[i])
+                table.insert(past_actions, actions[i])
             end
 
-            local future_steps = {}
+            local future_actions = {}
             for i = current + 1, total do
-                table.insert(future_steps, steps[i])
+                table.insert(future_actions, actions[i])
             end
 
-            local steps = {
-                past_steps = past_steps,
-                current_step = steps[current],
-                future_steps = future_steps
+            local actions = {
+                past_actions = past_actions,
+                current_action = actions[current],
+                future_actions = future_actions
             }
 
             local prototype = character.prototype
@@ -101,7 +101,7 @@ function state_data(character_id, radius)
                     progress = fle_utils.floor(
                         character.crafting_queue_progress, DECIMALS)
                 },
-                steps = steps
+                actions = actions
             }
 
             table.insert(state.agents, record)
