@@ -162,8 +162,6 @@ class FLE:
             platform=platform,
         )
 
-
-
         print(f"Created Factorio instance: {container.name} (ID: {container.short_id})")
 
         return container

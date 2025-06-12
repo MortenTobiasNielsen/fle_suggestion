@@ -187,7 +187,7 @@ function add_step(character_index, step)
     return "Step added successfully."
 end
 
-remote.add_interface("AICommands", {
+remote.add_interface("FLE", {
     reset = function(num_characters)
         if not num_characters or num_characters < 1 and num_characters > 9 then
             rcon.print(
