@@ -14,7 +14,7 @@ local status_names, direction_names = {}, {}
 for n, c in pairs(defines.entity_status) do status_names[c] = n end
 for n, c in pairs(defines.direction) do direction_names[c] = n end
 
-function state(character_index, radius)
+function state_data(character_index, radius)
     local characters = global.fle.characters
     if not characters or #characters == 0 then
         return json.encode({
@@ -33,8 +33,6 @@ function state(character_index, radius)
         flow = {production = {}, consumption = {}},
         research_queue = {}
     }
-
-    game.print("Processing character")
 
     ---------------------------------------------------------------------------
     -- Characters
@@ -79,6 +77,8 @@ function state(character_index, radius)
                 future_steps = future_steps
             }
 
+            local prototype = character.prototype
+
             local record = {
                 character_index = id,
                 position = position,
@@ -87,20 +87,28 @@ function state(character_index, radius)
                     guns = gun_stats,
                     ammo = ammo_stats
                 },
-                steps = steps,
-                walking_state = character.walking_state,
-                mining_state = character.mining_state,
-                mining_progress = character.character_mining_progress,
-                crafting_queue = character.crafting_queue or {},
-                crafting_queue_progress = fle_utils.floor(
-                    character.crafting_queue_progress, DECIMALS)
+                walking = {
+                    is_walking = character.walking_state.walking,
+                    direction = character.walking_state.direction
+                },
+                mining = {
+                    speed = prototype.mining_speed * 1 +
+                        character.character_mining_speed_modifier,
+                    progress = character.character_mining_progress,
+                    is_mining = character.mining_state.mining,
+                    position = character.mining_state.position
+                },
+                crafting = {
+                    queue = character.crafting_queue or {},
+                    progress = fle_utils.floor(
+                        character.crafting_queue_progress, DECIMALS)
+                },
+                steps = steps
             }
 
             table.insert(state.characters, record)
         end
     end
-
-    game.print("Processing buildings")
 
     ---------------------------------------------------------------------------
     -- Buildings
@@ -194,11 +202,25 @@ function state(character_index, radius)
                 if recipe then record.recipe = recipe.name end
             end
 
+            if building.drop_target then
+                record.drop_target = {
+                    name = building.drop_target.name,
+                    position = building.drop_target.position
+                }
+            end
+
+            if building.type == "inserter" and building.pickup_target then
+                record.pickup_target = {
+                    name = building.pickup_target.name,
+                    position = building.pickup_target.position
+                }
+            end
+
+            -- Add how many ticks of fuel is left, how many ticks is left for the next craft to finish, how many crafts can be made with the current input inventory and how much time that is.  
+
             table.insert(state.buildings, record)
         end
     end
-
-    game.print("Processing electricity")
 
     ---------------------------------------------------------------------------
     -- Electricity
@@ -262,8 +284,6 @@ function state(character_index, radius)
         }
     end
 
-    game.print("Processing flow")
-
     ---------------------------------------------------------------------------
     -- Flow
     ---------------------------------------------------------------------------
@@ -324,8 +344,6 @@ function state(character_index, radius)
         end
     end
 
-    game.print("Processing research")
-
     ---------------------------------------------------------------------------
     -- Research queue
     ---------------------------------------------------------------------------
@@ -358,8 +376,6 @@ function state(character_index, radius)
 
                 local record = {
                     name = name,
-                    researched = technology.researched,
-                    enabled = technology.enabled,
                     level = technology.level,
                     research_unit_count = technology.research_unit_count,
                     research_unit_energy = technology.research_unit_energy,
@@ -376,9 +392,7 @@ function state(character_index, radius)
         end
     end
 
-    game.print("Done processing state")
-
     return json.encode(state)
 end
 
-return state
+return state_data

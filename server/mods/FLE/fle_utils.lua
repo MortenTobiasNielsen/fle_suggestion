@@ -49,7 +49,6 @@ function fle_utils.check_selection_reach(character, character_config,
     return true
 end
 
--- Check that it is possible to get the inventory of the entity
 function fle_utils.check_inventory(character, character_config, inventory_type)
     character_config.target_inventory = character.selected.get_inventory(
                                             inventory_type) or
@@ -75,7 +74,7 @@ function fle_utils.to_position(position)
 end
 
 function fle_utils.format_name(str)
-    return str:gsub("^%l", string.upper):gsub("-", " ") -- uppercase first letter and replace dashes with spaces
+    return str:gsub("^%l", string.upper):gsub("-", " ")
 end
 
 function fle_utils.item_is_tile(item)

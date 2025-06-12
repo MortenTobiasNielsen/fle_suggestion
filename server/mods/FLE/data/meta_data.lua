@@ -8,8 +8,7 @@ function meta_data(character_index, radius)
     local surface = character.surface
 
     local meta_data = {
-        resources = {trees = {}},
-        rocks = {},
+        resources = {trees = {}, special = {}},
         items = {},
         recipes = {},
         technologies = {}
@@ -19,7 +18,7 @@ function meta_data(character_index, radius)
     local resources = surface.find_entities_filtered {
         position = character.position,
         radius = radius,
-        type = {"resource", "tree"}
+        type = {"resource", "tree", "simple-entity"}
     }
 
     for _, entity in ipairs(resources) do
@@ -37,56 +36,48 @@ function meta_data(character_index, radius)
                 {x = left_top_x, y = left_top_y},
                 {x = right_bottom_x, y = right_bottom_y}
             }
-
-            if entity.type == "tree" then
-                table.insert(meta_data.resources.trees,
-                             {selection_box = selection_box})
-            else
-                local name = entity.name
-                meta_data.resources[name] =
-                    meta_data.resources[name] or {}
-                table.insert(meta_data.resources[name], {
-                    selection_box = selection_box,
-                    amount = entity.amount
-                })
-            end
-        end
-    end
-
-    -- === Rocks ===
-    local entities = surface.find_entities_filtered {
-        position = character.position,
-        radius = radius,
-        type = {"simple-entity"}
-    }
-
-    for _, entity in ipairs(entities) do
-        if entity.valid then
+            
             local prototype = entity.prototype
-
-            if prototype and prototype.mineable_properties.minable then
-
-                local box = entity.selection_box
-                local left_top = box.left_top
-                local right_bottom = box.right_bottom
-
-                local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
-                local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
-                local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
-                local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
-
-                local selection_box = {
-                    {x = left_top_x, y = left_top_y},
-                    {x = right_bottom_x, y = right_bottom_y}
-                }
-
-                record = {
+            if entity.type == "tree" then
+                table.insert(meta_data.resources.trees, {
                     mining_time = prototype.mineable_properties.mining_time,
                     output = prototype.mineable_properties.products,
                     selection_box = selection_box
-                }
+                })
+            elseif entity.type == "simple-entity" then
+                if prototype and prototype.mineable_properties.minable then
 
-                table.insert(meta_data.rocks, record)
+                    local box = entity.selection_box
+                    local left_top = box.left_top
+                    local right_bottom = box.right_bottom
+
+                    local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
+                    local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
+                    local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
+                    local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
+
+                    local selection_box = {
+                        {x = left_top_x, y = left_top_y},
+                        {x = right_bottom_x, y = right_bottom_y}
+                    }
+
+                    table.insert(meta_data.special, {
+                        mining_time = prototype.mineable_properties.mining_time,
+                        output = prototype.mineable_properties.products,
+                        selection_box = selection_box
+                    })
+                end
+            else
+                local name = entity.name
+
+                meta_data.resources[name] =
+                    meta_data.resources[name] or {}
+                table.insert(meta_data.resources[name], {
+                    mining_time = prototype.mineable_properties.mining_time,
+                    output = prototype.mineable_properties.products,
+                    selection_box = selection_box,
+                    amount = entity.amount
+                })
             end
         end
     end

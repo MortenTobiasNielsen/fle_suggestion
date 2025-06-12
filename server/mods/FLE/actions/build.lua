@@ -204,8 +204,7 @@ function build(character, character_config, target_position, item, direction)
                 name = item,
                 position = target_position,
                 direction = direction,
-                build_check_type = defines.build_check_type.script_ghost,
-                forced = true
+                build_check_type = defines.build_check_type.ghost_revive
             } or global.fle.game_surface.can_fast_replace{
                 name = item,
                 position = target_position,

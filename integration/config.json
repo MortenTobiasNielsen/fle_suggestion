@@ -1,0 +1,354 @@
+[
+  {
+    "instances": 1,
+    "teams": [
+      {
+        "goal": {
+          "item": "iron-ore",
+          "target": 16
+        },
+        "planners": [
+          {
+            "provider": "OpenAI",
+            "name": "gpt-o3-mini",
+            "responsibility": "Do high level analysis on resource locations, factorio design, and electricity needs. Provide insights to your agents."
+          }
+        ],
+        "agents": [
+          {
+            "provider": "Ollama",
+            "name": "qwen2.5-coder:14b",
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": 2.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": 2.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "provider": "OpenAI",
+            "name": "gpt-4o-mini-2024-07-18",
+            "version": 768,
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": 4.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": 4.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "goal": {
+          "item": "copper-ore",
+          "target": 16
+        },
+        "agents": [
+          {
+            "provider": "Ollama",
+            "name": "qwen2.5-coder:14b",
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": -2.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": -2.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "provider": "OpenAI",
+            "name": "gpt-4o-mini-2024-07-18",
+            "version": 768,
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": -4.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": -4.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "instances": 1,
+    "teams": [
+      {
+        "goal": {
+          "item": "iron-plate",
+          "target": 16
+        },
+        "agents": [
+          {
+            "provider": "Ollama",
+            "name": "qwen2.5-coder:14b",
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": 2.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": 2.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "provider": "OpenAI",
+            "name": "gpt-4o-mini-2024-07-18",
+            "version": 768,
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": -2.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": -2.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "provider": "Anthropic",
+            "name": "claude-3-5-sonnet-latest",
+            "characters": [
+              {
+                "spawn_position": {
+                  "x": 0.0,
+                  "y": 1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              },
+              {
+                "spawn_position": {
+                  "x": 0.0,
+                  "y": -1.0
+                },
+                "inventory": {
+                  "main": {
+                    "burner-mining-drill": 1,
+                    "stone-furnace": 1,
+                    "wood": 1
+                  },
+                  "gun": {
+                    "pistol": 1
+                  },
+                  "ammo": {
+                    "firearm-magazine": 10
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,12 +1,10 @@
--- A docker image with the Factorio headless server which has a mod with different scenarios. The mod exposes LUA functions for all the actions available in the game including extracting stats.
--- An application makes it easy to configure and spin up the docker image for a specific scenario and with a specific amount of agents. It includes a thin RCON wrapper mapping to the exposed LUA functions, so it is easy to work with. 
 local json = require("dkjson")
 local crash_site = require("crash-site")
 local util = require("util")
 
 local fle_utils = require("fle_utils")
 local handle_tick = require("handle_tick")
-local state = require("data.state")
+local state_data = require("data.state_data")
 local meta_data = require("data.meta_data")
 local map_data = require("data.map_data")
 
@@ -23,7 +21,7 @@ script.on_init(function()
     global.font_size = 0.15
     global.fle.game_surface = game.surfaces["nauvis"]
     global.fle.backup = game.create_surface("scenario_backup")
-    global.fle.area = {{-1000, -1000}, {1000, 1000}} -- Change this so it instead uses a radius from the a specific character position
+    global.fle.area = {{-1000, -1000}, {1000, 1000}}
 
     global.fle.game_surface.clone_area {
         source_area = global.fle.area,
@@ -171,26 +169,18 @@ end
 
 function add_steps(character_index, steps)
     for i = 1, #steps do add_step(character_index, steps[i]) end
-
     return "Steps added successfully."
 end
 
 function add_step(character_index, step)
     if not global.fle.characters[character_index] then
-
-        -- game.print("Character index " .. character_index .. " does not exist.")
-
         return "Character does not exist."
     end
 
     local character = global.fle.characters[character_index]
     if not character.valid then
-        -- game.print("Character at index " .. character_index .. " is not valid.")
         return "Character is invalid."
     end
-
-    -- game.print(string.format("Adding step for character %d: %s",
-    --                          character_index, step))
 
     table.insert(global.fle.character_configs[character_index].steps, step)
 
@@ -206,8 +196,8 @@ remote.add_interface("AICommands", {
 
         rcon.print(reset_scenario(num_characters))
     end,
-    state = function(character_index, radius)
-        rcon.print(state(character_index, radius))
+    state_data = function(character_index, radius)
+        rcon.print(state_data(character_index, radius))
     end,
     meta_data = function(character_index, radius)
         rcon.print(meta_data(character_index, radius))

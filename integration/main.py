@@ -9,7 +9,11 @@ from docker.client import DockerClient
 from docker.models.containers import Container
 from factorio_rcon import RCONClient
 
-from step_handler import InventoryType, Position, StepHandler
+
+from communication_handler import CommunicationHandler, DataType
+from models.defines import InventoryType
+from models.position import Position
+from step_parser import StepParser
 
 def create_factorio_instances(
     image_name: str,
@@ -210,68 +214,51 @@ if __name__ == "__main__":
         first_rcon_port = 27015,
     )
 
-    wait_for_connection(container=containers[0])
+    # wait_for_connection(container=containers[0])
 
-    rcon_client = RCONClient("127.0.0.1", 27015, "factorio")
-    step_handler = StepHandler(rcon_client, 1)
 
     try:
+        rcon_client = RCONClient("127.0.0.1", 27015, "factorio")
+        communication_handler = CommunicationHandler(rcon_client, 1)
+
         data1 = rcon_client.send_command('/sc remote.call("AICommands", "reset", 1)')
-        step_handler.research("steel-axe")
-        step_handler.walk(Position(30.0, -20.0))
-        step_handler.mine(Position(30.5, -20.5), 121)
-        step_handler.walk(Position(0.0, 0.0))
-        step_handler.take(Position(0.5, -7.5), "coal", 500, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "burner-mining-drill", 50, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "stone-furnace", 50, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "transport-belt", 500, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "small-electric-pole", 100, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "assembling-machine-1", 20, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "pipe", 100, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "pipe-to-ground", 50, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "pumpjack", 5, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "oil-refinery", 5, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "chemical-plant", 5, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "inserter", 50, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "burner-inserter", 50, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "wooden-chest", 10, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "boiler", 2, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "steam-engine", 2, InventoryType.CHEST)
-        step_handler.take(Position(0.5, -7.5), "offshore-pump", 2, InventoryType.CHEST)
-        data2 = rcon_client.send_command('/sc remote.call("AICommands", "state", 1, 150)')
-        data3 = rcon_client.send_command('/sc remote.call("AICommands", "meta_data", 1, 150)')
-        data4 = rcon_client.send_command('/sc remote.call("AICommands", "map_data", 1, 150)')
-
-
-        steps_path = os.path.join(os.path.dirname(__file__), "steps.lua")
-        if os.path.exists(steps_path):
-            with open(steps_path, "r", encoding="utf-8") as steps_file:
-                steps = "{"
-
-                for line in steps_file:
-                    line = line.strip()
-                    if not line or line.startswith("--"):  # skip empty lines and Lua comments
-                        continue
-                    else:
-                        steps = steps + line + ","
-
-                steps = steps + "}"
-                try:
-                    response = rcon_client.send_command(
-                        f'/sc remote.call("AICommands", "add_steps", 1, {steps})'
-                    )
-                    print(f"Sent steps\nResponse: {response}")
-                except Exception as e:
-                    print(f"Failed to send steps: {e}")
-        else:
-            print(f"steps.lua not found at {steps_path}")
+        
+        steps_path = os.path.join(os.path.dirname(__file__), "steps_lab.lua")
+        communication_handler.research("steel-axe")
+        communication_handler.take(Position(0.5, -7.5), "coal", 500, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "burner-mining-drill", 50, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "stone-furnace", 50, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "transport-belt", 500, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "small-electric-pole", 100, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "assembling-machine-1", 20, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "pipe", 100, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "pipe-to-ground", 50, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "pumpjack", 5, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "oil-refinery", 5, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "chemical-plant", 5, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "inserter", 50, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "burner-inserter", 50, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "wooden-chest", 10, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "boiler", 2, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "steam-engine", 2, InventoryType.CHEST)
+        communication_handler.take(Position(0.5, -7.5), "offshore-pump", 2, InventoryType.CHEST)
+        step_parser = StepParser(steps_path, communication_handler)
+        step_parser.parse()
+    #     communication_handler.walk(Position(30.0, -20.0))
+    #     communication_handler.mine(Position(30.5, -20.5), 121)
+    #     communication_handler.walk(Position(0.0, 0.0))
+        data2 = communication_handler.get_data(DataType.STATE, 150)
+        data3 = communication_handler.get_data(DataType.META, 150)
+        data4 = communication_handler.get_data(DataType.MAP, 150)
 
         data5 = rcon_client.send_command('/sc remote.call("AICommands", "execute_steps")')
-        data6 = rcon_client.send_command('/sc remote.call("AICommands", "state", 1, 150)')
+        data6 = communication_handler.get_data(DataType.STATE, 150)
 
         meta = json.loads(data3)
         map = json.loads(data4)
         state = json.loads(data6)
+
+        test = 1
     except Exception as e:
         print(f"Error during RCON communication: {e}")
         shutdown_factorio_instances(containers)
