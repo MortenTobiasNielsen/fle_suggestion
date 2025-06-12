@@ -188,7 +188,7 @@ class StepParser:
                             ticks = self._find_last(remaining)
                             ticks = int(ticks)
 
-                            result = self.communication_handler.idle(ticks)
+                            result = self.communication_handler.wait(ticks)
 
                         elif type == "mine":
                             position, remaining = self._find_between_curly_bracers(remaining)

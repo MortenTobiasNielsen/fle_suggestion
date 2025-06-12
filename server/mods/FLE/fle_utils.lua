@@ -26,10 +26,7 @@ function fle_utils.check_selection_reach(character, character_config,
 
     if not character.selected then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - %s: Cannot select entity",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             global.tas.task_category))
+            -- Meaningful error message
         end
 
         return false
@@ -37,10 +34,7 @@ function fle_utils.check_selection_reach(character, character_config,
 
     if not character.can_reach_entity(character.selected) then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - %s: Cannot reach entity",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             global.tas.task_category))
+            -- Meaningful error message
         end
 
         return false
@@ -56,10 +50,7 @@ function fle_utils.check_inventory(character, character_config, inventory_type)
 
     if not character_config.target_inventory then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - %s: Cannot get entity inventory",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             global.tas.task_category))
+            -- Meaningful error message
         end
 
         return false

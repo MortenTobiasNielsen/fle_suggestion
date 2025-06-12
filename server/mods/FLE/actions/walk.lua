@@ -220,14 +220,6 @@ function walk.update(character, character_config)
     local destination = character_config.destination
     local current_direction = character_config.walking.direction
 
-    if character_config.character_index == 1 then
-        -- game.print(string.format(
-        --                "Character %d: Position: (%.2f, %.2f), Destination: (%.2f, %.2f), Keep X: %s, Keep Y: %s, Diagonal: %s",
-        --                character_config.character_index, character_position.x,
-        --                character_position.y, destination.x, destination.y,
-        --                tostring(keep_x), tostring(keep_y), tostring(diagonal)))
-    end
-
     if character_config.pos_pos then
         return walk_pos_pos(keep_x, keep_y, diagonal, character_position,
                             destination, current_direction)

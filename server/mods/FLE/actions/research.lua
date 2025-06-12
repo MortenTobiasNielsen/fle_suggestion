@@ -1,29 +1,25 @@
-function research(character, name, cancel)
+function research(character, name)
     local force = character.force
     local technology = force.technologies[name]
 
-	if not technology then
-        -- log("Technology '" .. name .. "' does not exist for force '" .. force.name .. "'.")
+    if not technology then
+        -- Meaningful error message
         return false
     end
 
     if technology.researched then
-        -- log("Technology '" .. name .. "' has already been researched.")
+        -- Meaningful error message
         return false
     end
 
     if not technology.enabled then
-        -- log("Technology '" .. name .. "' is not enabled and cannot be researched.")
+        -- Meaningful error message
         return false
-    end
-
-    if cancel then
-        force.research_queue = {}
     end
 
     local success = force.add_research(name)
     if not success then
-        -- log("Failed to add technology '" .. name .. "' to the research queue.")
+        -- Meaningful error message
         return false
     end
 

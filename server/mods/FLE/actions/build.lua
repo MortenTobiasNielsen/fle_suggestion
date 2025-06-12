@@ -6,8 +6,7 @@ local function create_entity_replace(character, character_config,
     local stack, stack_location = character.get_inventory(1).find_item_stack(
                                       item)
     if not stack or not stack.valid then
-        Error("Trying to create an entity of " .. item ..
-                  " but couldn't find a stack of them in characters inventory")
+        -- Meaningful error message
         return false
     end
 
@@ -36,7 +35,7 @@ local function create_entity_replace(character, character_config,
     }
 
     if created_entity and fast_replace_type_lookup[created_entity.name] ~= nil and
-        created_entity.neighbours then -- connected entities eg underground belt https://lua-api.factorio.com/latest/LuaEntity.html#LuaEntity.neighbours
+        created_entity.neighbours then
         created_entity.create_build_effect_smoke()
         created_entity.surface.play_sound {
             path = "entity-build/" .. created_entity.prototype.name,
@@ -56,9 +55,9 @@ local function create_entity_replace(character, character_config,
                 end
             end
         end
+
         if (not neighbour_position) then
             character.remove_item({name = item, count = 1})
-            -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.item ))
             return true
         end
 
@@ -79,11 +78,13 @@ local function create_entity_replace(character, character_config,
                     }
                 }
             }
+
         local entities_between_length = math.abs(
                                             created_entity.position.x -
                                                 neighbour_position.x +
                                                 created_entity.position.y -
                                                 neighbour_position.y) - 1
+
         local can_replace_all = entities_between_length == #entities_between
 
         -- chech that all entities betweeen are in the same direction
@@ -112,15 +113,15 @@ local function create_entity_replace(character, character_config,
                 if not can_replace_all then break end -- break out
             end
         end
+
         -- mine all entities inbetween
         if can_replace_all then
             for __, e in pairs(entities_between) do
                 character.mine_entity(e, true)
             end
         end
-        -- spend the item placed
+
         character.remove_item({name = item, count = 1})
-        -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.item ))
         return true
     end
 
@@ -134,7 +135,6 @@ local function create_entity_replace(character, character_config,
 
         created_entity.health = stack.health * created_entity.health
 
-        -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, global.tas.item ))
         character.remove_item({name = item, count = 1})
     end
 
@@ -148,10 +148,7 @@ function build(character, character_config, target_position, item, direction)
     if count < 1 then
         if (character_config.step_number > character_config.step_reached) then
             if character_config.walking.walking == false then
-                Warning(string.format(
-                            "Step_number: %d - Build: %s not available",
-                            character_config.step_number,
-                            fle_utils.format_name(item)))
+                -- Meaningful error message
                 character_config.step_reached = character_config.step_number
             end
         end
@@ -190,11 +187,7 @@ function build(character, character_config, target_position, item, direction)
                 end
 
                 character.remove_item({name = item, count = 1})
-                -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
                 return true
-
-            elseif not character_config.walking.walking then
-                -- Warning(string.format("Step: %s, Action: %s, Step: %d - Build: %s not in reach", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
             end
 
             return false
@@ -205,20 +198,15 @@ function build(character, character_config, target_position, item, direction)
                 position = target_position,
                 direction = direction,
                 build_check_type = defines.build_check_type.ghost_revive
-            } or global.fle.game_surface.can_fast_replace{
+            } or global.fle.game_surface.can_fast_replace {
                 name = item,
                 position = target_position,
                 direction = direction,
                 force = character.force
             }) then
-            -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
             return create_entity_replace(character, character_config,
                                          target_position, item, direction)
         else
-            if not character_config.walking.walking then
-                -- Warning(string.format("Step: %s, Action: %s, Step: %d - Build: %s cannot be placed", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
-            end
-
             return false
         end
     else
@@ -238,15 +226,10 @@ function build(character, character_config, target_position, item, direction)
                 raise_built = true
             } then
                 character.remove_item({name = item, count = 1})
-                -- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Build: [item=%s]", global.tas.task[1], global.tas.task[2], global.tas.step, item ))
                 return true
             end
 
         else
-            if not character_config.walking.walking then
-                -- Warning(string.format("Step: %s, Action: %s, Step: %d - Build: %s cannot be placed", global.tas.task[1], global.tas.task[2], global.tas.step, item:gsub("-", " "):gsub("^%l", string.upper)))
-            end
-
             return false
         end
     end

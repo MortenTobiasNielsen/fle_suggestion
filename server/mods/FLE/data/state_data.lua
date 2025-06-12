@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("include.dkjson")
 local fle_utils = require("fle_utils")
 
 local DECIMALS = 2
@@ -114,7 +114,6 @@ function state_data(character_index, radius)
     -- Buildings
     ---------------------------------------------------------------------------
 
-    -- gather entities
     local buildings = global.fle.game_surface.find_entities_filtered {
         position = character.position,
         radius = radius,
@@ -159,13 +158,11 @@ function state_data(character_index, radius)
 
             local inventory_stats = {}
 
-            -- Fuel inventory
             local fuel_inventory = building.get_fuel_inventory()
             if fuel_inventory then
                 inventory_stats.fuel = fle_utils.inventory_stats(fuel_inventory)
             end
 
-            -- Input inventory (assembling machine or lab)
             local input_inventory = building.get_inventory(defines.inventory
                                                                .assembling_machine_input)
             if not input_inventory then
@@ -177,26 +174,22 @@ function state_data(character_index, radius)
                                             input_inventory)
             end
 
-            -- Output inventory
             local output_inventory = building.get_output_inventory()
             if output_inventory then
                 inventory_stats.output =
                     fle_utils.inventory_stats(output_inventory)
             end
 
-            -- Module inventory
             local module_inventory = building.get_module_inventory()
             if module_inventory then
                 inventory_stats.moduels =
                     fle_utils.inventory_stats(module_inventory)
             end
 
-            -- Add inventory_stats to record if any inventories are present
             if next(inventory_stats) then
                 record.inventory_stats = inventory_stats
             end
 
-            -- Recipe information
             if building.prototype.crafting_categories then
                 local recipe = building.get_recipe()
                 if recipe then record.recipe = recipe.name end

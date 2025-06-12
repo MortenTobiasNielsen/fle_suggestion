@@ -21,10 +21,7 @@ function put(character, character_config, target_position, item, quantity,
 
     if removalable_items == 0 then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - Put: %s is not available in your inventory",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             item:gsub("-", " "):gsub("^%l", string.upper)))
+            -- Meaningful error message
         end
 
         return false;
@@ -32,10 +29,7 @@ function put(character, character_config, target_position, item, quantity,
 
     if insertable_items == 0 then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - Put: %s can't be put into target inventory",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             item:gsub("-", " "):gsub("^%l", string.upper)))
+            -- Meaningful error message
         end
 
         return false;
@@ -43,11 +37,7 @@ function put(character, character_config, target_position, item, quantity,
 
     if quantity > removalable_items or quantity > insertable_items then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step: %s, Action: %s, Step: %d - Put: not enough %s can be transferred. Amount: %d Removalable: %d Insertable: %d",
-            --             global.tas.task[1], global.tas.task[2], global.tas.step,
-            --             item:gsub("-", " "):gsub("^%l", string.upper), quantity,
-            --             removalable_items, insertable_items))
+            -- Meaningful error message
         end
 
         return false
@@ -57,7 +47,7 @@ function put(character, character_config, target_position, item, quantity,
     while quantity > moved do
         local item_stack = character.get_main_inventory().find_item_stack(item)
         if not item_stack then
-            Error("Item stack " .. item .. " not found for put")
+            -- Meaningful error message
             return false
         end
         local health = item_stack.health
@@ -83,11 +73,7 @@ function put(character, character_config, target_position, item, quantity,
             }
         } then
             if not character_config.walking.walking then
-                -- Warning(string.format(
-                --             "Step: %s, Action: %s, Step: %d - Put: %s can not be transferred. Amount: %d Removalable: %d Insertable: %d",
-                --             global.tas.task[1], global.tas.task[2], global.tas.step,
-                --             item:gsub("-", " "):gsub("^%l", string.upper), quantity,
-                --             removalable_items, insertable_items))
+                -- Meaningful error message
             end
             return false
         end
@@ -101,7 +87,8 @@ function put(character, character_config, target_position, item, quantity,
     }
     local player = character.player
     if player then
-        local text = string.format("-%d %s (%d)", quantity, fle_utils.format_name(item),
+        local text = string.format("-%d %s (%d)", quantity,
+                                   fle_utils.format_name(item),
                                    character.get_item_count(item)) -- "-2 Iron plate (5)"
         local pos = {
             x = character_config.target_inventory.entity_owner.position.x +

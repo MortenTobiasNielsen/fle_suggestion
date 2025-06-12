@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("include.dkjson")
 local fle_utils = require("fle_utils")
 local DECIMALS = 2
 
@@ -14,7 +14,9 @@ function meta_data(character_index, radius)
         technologies = {}
     }
 
-    -- === Resources ===
+    ---------------------------------------------------------------------------
+    -- Resources
+    ---------------------------------------------------------------------------
     local resources = surface.find_entities_filtered {
         position = character.position,
         radius = radius,
@@ -82,7 +84,9 @@ function meta_data(character_index, radius)
         end
     end
 
-    -- === Items ===
+    ---------------------------------------------------------------------------
+    -- Items
+    ---------------------------------------------------------------------------
     for _, item in pairs(game.item_prototypes) do
         local item_data = {
             name = item.name,
@@ -105,7 +109,9 @@ function meta_data(character_index, radius)
         table.insert(meta_data.items, item_data)
     end
 
-    -- === Recipes ===
+    ---------------------------------------------------------------------------
+    -- Recipes
+    ---------------------------------------------------------------------------
     for _, recipe in pairs(force.recipes) do
         local ingredients = {}
         for _, ingredient in pairs(recipe.ingredients) do
@@ -134,7 +140,9 @@ function meta_data(character_index, radius)
         })
     end
 
-    -- === Technologies ===
+    ---------------------------------------------------------------------------
+    -- Technologies
+    ---------------------------------------------------------------------------
     for _, technology in pairs(force.technologies) do
         local prerequisites = {}
         for _, prerequisite in pairs(technology.prerequisites) do

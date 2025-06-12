@@ -21,11 +21,7 @@ function take(character, character_config, target_position, item, quantity,
 
     if removalable_items == 0 then
         if not character_config.walking.walking then
-            -- Warning({
-            --     "step-warning.take", global.tas.task[1], global.tas.task[2],
-            --     global.tas.step, fle_utils.format_name(item),
-            --     "is not available from the inventory"
-            -- })
+            -- Meaningful error message
         end
 
         return false;
@@ -33,10 +29,7 @@ function take(character, character_config, target_position, item, quantity,
 
     if insertable_items == 0 then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step_number: %d - Take: %s can't be put into your inventory",
-            --             character_config.step_number,
-            --             fle_utils.format_name(item)))
+            -- Meaningful error message
         end
 
         return false;
@@ -48,11 +41,7 @@ function take(character, character_config, target_position, item, quantity,
 
     if quantity > removalable_items or quantity > insertable_items then
         if not character_config.walking.walking then
-            -- Warning(string.format(
-            --             "Step_number: %d - Take: not enough %s can be transferred. Quantity: %d Removalable: %d Insertable: %d",
-            --             character_config.step_number,
-            --             fle_utils.format_name(item), quantity,
-            --             removalable_items, insertable_items))
+            -- Meaningful error message
         end
 
         return false
@@ -63,7 +52,7 @@ function take(character, character_config, target_position, item, quantity,
         local item_stack = character_config.target_inventory.find_item_stack(
                                item)
         if not item_stack then
-            Error("Item stack " .. item .. " not found for take")
+            -- Meaningful error message
             return false
         end
         local health = item_stack.health
@@ -88,10 +77,7 @@ function take(character, character_config, target_position, item, quantity,
                 ammo = ammo
             }
         } then
-            Error(string.format(
-                      "Step_number: %d - Take: %s can not be transferred. Quantity: %d Removalable: %d Insertable: %d",
-                      character_config.step_number, fle_utils.format_name(item),
-                      quantity, removalable_items, insertable_items))
+            -- Meaningful error message
             return false
         end
 

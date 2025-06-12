@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("include.dkjson")
 
 local function is_water_tile(tile_name)
     return tile_name == "water" or tile_name == "water-green" or tile_name ==

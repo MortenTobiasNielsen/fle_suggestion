@@ -14,7 +14,6 @@ function rotate(character, character_config, target_position, reverse)
 
 	if has_rotated then global.fle.game_surface.play_sound{path="utility/rotated_small", position=character.selected.position} end
 
-	-- end_warning_mode(string.format("Step: %s, Action: %s, Step: %d - Rotate", global.tas.task[1], global.tas.task[2], global.tas.step ))
 	return true
 end
 

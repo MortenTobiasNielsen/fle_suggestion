@@ -65,10 +65,11 @@ local function doStep(character, character_config, current_step)
         if current_step.cancel then
             return craft.cancel(character, character_config, current_step[2],
                                 current_step[3])
+        else 
+            return craft.add(character, character_config, current_step[2],
+                             current_step[3])
         end
-
-        return craft.add(character, character_config, current_step[2],
-                         current_step[3])
+        
 
     elseif action == "build" then
         return build(character, character_config,
@@ -91,6 +92,9 @@ local function doStep(character, character_config, current_step)
 
     elseif action == "research" then
         return research(character, current_step[2], current_step.cancel)
+
+    elseif action == "cancel_research" then
+        character.force.research_queue = {}
 
     elseif action == "recipe" then
         return recipe(character, character_config,
@@ -131,8 +135,8 @@ local function doStep(character, character_config, current_step)
         --     global.tas.player.picking_state = true
         --     return true
 
-    elseif action == "idle" then
-        character_config.idle = current_step[2]
+    elseif action == "wait" then
+        character_config.wait = current_step[2]
         return true
 
     elseif action == "launch" then
@@ -183,7 +187,7 @@ local function handle_pretick(character, character_config, steps)
             return -- no more steps to handle
         elseif (step[1] == "walk" and
             (character_config.walking.walking == false or
-                character_config.walk_towards) and character_config.idle < 1) then
+                character_config.walk_towards) and character_config.wait < 1) then
 
             update_walking(character, character_config, step)
         else
@@ -196,12 +200,12 @@ local function handle_ontick(character, character_config, step)
     local action = step[1]
 
     if character_config.walking.walking == false then
-        if character_config.idle > 0 then
-            character_config.idle = character_config.idle - 1
-            character_config.idled = character_config.idled + 1
+        if character_config.wait > 0 then
+            character_config.wait = character_config.wait - 1
+            character_config.waited = character_config.waited + 1
 
-            if character_config.idle == 0 then
-                character_config.idled = 0
+            if character_config.wait == 0 then
+                character_config.waited = 0
 
                 if action == "walk" then
                     update_walking(character, character_config, step)
@@ -220,7 +224,7 @@ local function handle_ontick(character, character_config, step)
         if global.walk_towards_state and action == "mine" then
             update_mining(character, character_config, step)
 
-        elseif action ~= "walk" and action ~= "idle" and action ~= "mine" then
+        elseif action ~= "walk" and action ~= "wait" and action ~= "mine" then
             if doStep(character, character_config, step) then
                 change_step(character_config)
             end

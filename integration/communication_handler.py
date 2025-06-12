@@ -76,7 +76,7 @@ class CommunicationHandler:
         step = f'{{"recipe", {position}, "{name}"}}'
         self._add_step(step)
     
-    def idle(self, ticks: int) -> str:
-        step = f'{{"idle", {ticks}}}'
+    def wait(self, ticks: int) -> str:
+        step = f'{{"wait", {ticks}}}'
         self._add_step(step)
     

@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("include.dkjson")
 local crash_site = require("crash-site")
 local util = require("util")
 
@@ -139,8 +139,8 @@ function reset_scenario(num_characters)
                 steps = {},
                 step_number = 1,
                 step_reached = 1,
-                idle = 0,
-                idled = 0,
+                wait = 0,
+                waited = 0,
                 mining = 0,
                 ticks_mining = 0,
                 walk_towards = false
@@ -204,9 +204,6 @@ remote.add_interface("FLE", {
     end,
     map_data = function(character_index, radius)
         rcon.print(map_data(character_index, radius))
-    end,
-    add_step = function(character_index, step)
-        rcon.print(add_step(character_index, step))
     end,
     add_steps = function(character_index, steps)
         rcon.print(add_steps(character_index, steps))
