@@ -1,0 +1,10 @@
+[project]
+name = "fle-suggestion"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "docker>=7.1.0",
+    "factorio-rcon-py>=2.1.3",
+]
