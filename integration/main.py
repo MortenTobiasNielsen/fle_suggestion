@@ -165,23 +165,27 @@ def run_image_check(image_name: str) -> None:
     script_path = os.path.join(os.path.dirname(__file__), "..", "server", "image_check.sh")
     script_path = os.path.abspath(script_path)
     
-    # Try different ways to run bash on Windows
-    bash_commands = []
+    # Try different shell commands based on platform
+    shell_commands = []
     
     if os.name == 'nt':  # Windows
         # Try different bash locations on Windows
-        bash_commands = [
+        shell_commands = [
             ["bash", script_path, image_name],
             ["C:\\Program Files\\Git\\bin\\bash.exe", script_path, image_name],
             ["C:\\Program Files (x86)\\Git\\bin\\bash.exe", script_path, image_name],
             ["wsl", "bash", script_path, image_name]
         ]
     else:
-        # Unix-like systems
-        bash_commands = [["bash", script_path, image_name]]
+        # Unix-like systems - try zsh first (common on macOS), then bash, then sh
+        shell_commands = [
+            ["zsh", script_path, image_name],
+            ["bash", script_path, image_name],
+            ["sh", script_path, image_name]
+        ]
     
     last_error = None
-    for cmd in bash_commands:
+    for cmd in shell_commands:
         try:
             print(f"Trying to run: {' '.join(cmd)}")
             completed = subprocess.run(
@@ -209,11 +213,13 @@ def run_image_check(image_name: str) -> None:
             continue
     
     # If we get here, all attempts failed
-    print("\n❌ Failed to run image check script with any available bash interpreter.")
+    print("\n❌ Failed to run image check script with any available shell interpreter.")
     print("Please ensure one of the following is available:")
-    print("  - Git Bash (recommended for Windows)")
+    print("  - zsh (default on macOS)")
+    print("  - bash")
+    print("  - sh")
+    print("  - Git Bash (for Windows)")
     print("  - WSL (Windows Subsystem for Linux)")
-    print("  - bash in your system PATH")
     print("\nAlternatively, you can run the image check manually:")
     print(f"  docker image inspect {image_name} || docker build -t {image_name} ../server")
     
