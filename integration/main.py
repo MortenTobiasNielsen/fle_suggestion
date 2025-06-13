@@ -177,8 +177,11 @@ def run_image_check(image_name: str) -> None:
             ["wsl", "bash", script_path, image_name]
         ]
     else:
-        # Unix-like systems - try zsh first (common on macOS), then bash, then sh
+        # Unix-like systems - try different approaches
         shell_commands = [
+            f"zsh {script_path} {image_name}",
+            f"bash {script_path} {image_name}",
+            f"sh {script_path} {image_name}",
             ["zsh", script_path, image_name],
             ["bash", script_path, image_name],
             ["sh", script_path, image_name]
@@ -187,15 +190,27 @@ def run_image_check(image_name: str) -> None:
     last_error = None
     for cmd in shell_commands:
         try:
-            print(f"Trying to run: {' '.join(cmd)}")
-            completed = subprocess.run(
-                cmd,
-                check=True,
-                cwd=os.path.dirname(__file__),
-                timeout=30,
-                capture_output=True,
-                text=True
-            )
+            if isinstance(cmd, str):
+                print(f"Trying to run: {cmd}")
+                completed = subprocess.run(
+                    cmd,
+                    shell=True,
+                    check=True,
+                    cwd=os.path.dirname(__file__),
+                    timeout=30,
+                    capture_output=True,
+                    text=True
+                )
+            else:
+                print(f"Trying to run: {' '.join(cmd)}")
+                completed = subprocess.run(
+                    cmd,
+                    check=True,
+                    cwd=os.path.dirname(__file__),
+                    timeout=30,
+                    capture_output=True,
+                    text=True
+                )
             if completed.stdout:
                 print("Build script output:\n", completed.stdout)
             if completed.stderr:
@@ -209,6 +224,11 @@ def run_image_check(image_name: str) -> None:
             last_error = e
             continue
         except subprocess.CalledProcessError as e:
+            print(f"Command failed with exit code {e.returncode}")
+            if e.stdout:
+                print(f"stdout: {e.stdout}")
+            if e.stderr:
+                print(f"stderr: {e.stderr}")
             last_error = e
             continue
     
