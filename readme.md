@@ -23,3 +23,10 @@ Contains all files related to running the Factorio server, including Docker setu
 - **scenarios/**: Contains the FLE_Lab scenario.
 - **mods/**: Contains the FLE mod.
 - **config/**: Server configuration files (settings, passwords, etc.).
+
+
+## Getting started
+1. Copy the server/mods/FLE folder into the mods folder on your own PC (if you want to login to the server)
+2. pip install -r requirements.txt in the root folder
+3. Put a breakpoint on line 307 in integration/main.py (to see the data structures)
+4. Run integration/main.py in debug mode
