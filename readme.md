@@ -1,6 +1,20 @@
 # FLE Suggestion
 This project demonstrates a separated Factorio Learning Environment (FLE) setup with a containerized Factorio server and modern REST API. The architecture combines the Factorio game server with a .NET API for structured data access, providing both game control via RCON and data retrieval via HTTP endpoints.
 
+## Table of Contents
+- [Architecture](#architecture)
+- [API/](#api)
+  - [API Endpoints](#api-endpoints)
+- [integration/](#integration)
+- [server/](#server)
+- [Docker Configuration](#docker-configuration)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+  - [Accessing Services](#accessing-services)
+  - [Development](#development)
+  - [Port Configuration](#port-configuration)
+
 ## Architecture
 
 The project uses a hybrid approach:
