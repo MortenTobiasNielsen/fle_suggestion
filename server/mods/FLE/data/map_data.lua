@@ -81,7 +81,7 @@ function map_data(character_id, radius)
         end
     end
 
-    return json.encode(map_data)
+    return map_data
 end
 
 return map_data

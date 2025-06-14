@@ -7,6 +7,12 @@ function fle_utils.inventory_stats(inv)
     local slots = #inv
     local empty = inv.count_empty_stacks()
     local items = inv.get_contents()
+    
+    if empty == slots or not items or not next(items) then
+        items = {}
+        setmetatable(items, {__jsontype = "object"})
+    end
+    
     return {slots = slots, empty = empty, items = items}
 end
 

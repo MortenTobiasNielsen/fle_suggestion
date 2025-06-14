@@ -1,6 +1,4 @@
 local json = require("include.dkjson")
-local fle_utils = require("fle_utils")
-local DECIMALS = 2
 
 function meta_data(character_id, radius)
     local character = global.fle.characters[character_id]
@@ -25,48 +23,47 @@ function meta_data(character_id, radius)
 
     for _, entity in ipairs(resources) do
         if entity.valid then
-            local box = entity.selection_box
-            local left_top = box.left_top
-            local right_bottom = box.right_bottom
-
-            local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
-            local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
-            local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
-            local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
-
-            local selection_box = {
-                {x = left_top_x, y = left_top_y},
-                {x = right_bottom_x, y = right_bottom_y}
-            }
-            
             local prototype = entity.prototype
             if entity.type == "tree" then
+                local output = {}
+                for _, product in pairs(prototype.mineable_properties.products) do
+                    table.insert(output, {
+                        name = product.name,
+                        amount = product.amount,
+                        probability = product.probability or 1
+                    })
+                end
+
                 table.insert(meta_data.resources.trees, {
                     mining_time = prototype.mineable_properties.mining_time,
-                    output = prototype.mineable_properties.products,
-                    selection_box = selection_box
+                    output = output,
+                    selection_box = entity.selection_box
                 })
             elseif entity.type == "simple-entity" then
                 if prototype and prototype.mineable_properties.minable then
+                    local output = {}
+                    for _, product in pairs(prototype.mineable_properties.products) do
 
-                    local box = entity.selection_box
-                    local left_top = box.left_top
-                    local right_bottom = box.right_bottom
+                        local amount_min = product.amount_min
+                        local amount_max = product.amount_max
 
-                    local left_top_x = fle_utils.floor(left_top.x, DECIMALS)
-                    local left_top_y = fle_utils.floor(left_top.y, DECIMALS)
-                    local right_bottom_x = fle_utils.ceil(right_bottom.x, DECIMALS)
-                    local right_bottom_y = fle_utils.ceil(right_bottom.y, DECIMALS)
+                        if product.amount ~= nil then
+                            amount_min = product.amount
+                            amount_max = product.amount
+                        end
 
-                    local selection_box = {
-                        {x = left_top_x, y = left_top_y},
-                        {x = right_bottom_x, y = right_bottom_y}
-                    }
+                        table.insert(output, {
+                            name = product.name,
+                            amount_min = amount_min,
+                            amount_max = amount_max,
+                            probability = product.probability or 1
+                        })
+                    end
 
-                    table.insert(meta_data.special, {
+                    table.insert(meta_data.resources.special, {
                         mining_time = prototype.mineable_properties.mining_time,
-                        output = prototype.mineable_properties.products,
-                        selection_box = selection_box
+                        output = output,
+                        selection_box = entity.selection_box
                     })
                 end
             else
@@ -74,12 +71,30 @@ function meta_data(character_id, radius)
 
                 meta_data.resources[name] =
                     meta_data.resources[name] or {}
-                table.insert(meta_data.resources[name], {
-                    mining_time = prototype.mineable_properties.mining_time,
-                    output = prototype.mineable_properties.products,
-                    selection_box = selection_box,
-                    amount = entity.amount
-                })
+
+                if name == "crude-oil" then
+                    table.insert(meta_data.resources[name], {
+                        selection_box = entity.selection_box,
+                        amount = entity.amount
+                    })
+
+                else
+                    local output = {}
+                    for _, product in pairs(prototype.mineable_properties.products) do
+                        table.insert(output, {
+                            name = product.name,
+                            amount = product.amount,
+                            probability = product.probability or 1
+                        })
+                    end
+
+                    table.insert(meta_data.resources[name], {
+                        mining_time = prototype.mineable_properties.mining_time,
+                        output = output,
+                        selection_box = entity.selection_box,
+                        amount = entity.amount
+                    })
+                end
             end
         end
     end
@@ -157,10 +172,16 @@ function meta_data(character_id, radius)
 
         local effects = {}
         for _, effect in pairs(technology.effects) do
+            -- Ensure modifier is always a number, in a rare case it is a boolean
+            local modifier = effect.modifier
+            if type(modifier) ~= "number" then
+                modifier = 1
+            end
+            
             table.insert(effects, {
                 type = effect.type,
                 recipe = effect.recipe,
-                modifier = effect.modifier
+                modifier = modifier
             })
         end
 
@@ -177,7 +198,7 @@ function meta_data(character_id, radius)
         })
     end
 
-    return json.encode(meta_data)
+    return meta_data
 end
 
 return meta_data
