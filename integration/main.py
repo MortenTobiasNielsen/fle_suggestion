@@ -165,12 +165,10 @@ def run_image_check(image_name: str) -> None:
     script_path = os.path.join(os.path.dirname(__file__), "..", "server", "image_check.sh")
     script_path = os.path.abspath(script_path)
     
-    # Try different ways to run bash on Windows
-    bash_commands = []
+    commands = []
     
     if os.name == 'nt':  # Windows
-        # Try different bash locations on Windows
-        bash_commands = [
+        commands = [
             ["bash", script_path, image_name],
             ["C:\\Program Files\\Git\\bin\\bash.exe", script_path, image_name],
             ["C:\\Program Files (x86)\\Git\\bin\\bash.exe", script_path, image_name],
@@ -178,20 +176,39 @@ def run_image_check(image_name: str) -> None:
         ]
     else:
         # Unix-like systems
-        bash_commands = [["bash", script_path, image_name]]
+        commands = [
+            f"zsh {script_path} {image_name}",
+            f"bash {script_path} {image_name}",
+            f"sh {script_path} {image_name}",
+            ["zsh", script_path, image_name],
+            ["bash", script_path, image_name],
+            ["sh", script_path, image_name]
+        ]
     
     last_error = None
-    for cmd in bash_commands:
+    for cmd in commands:
         try:
-            print(f"Trying to run: {' '.join(cmd)}")
-            completed = subprocess.run(
-                cmd,
-                check=True,
-                cwd=os.path.dirname(__file__),
-                timeout=30,
-                capture_output=True,
-                text=True
-            )
+            if isinstance(cmd, str):
+                print(f"Trying to run: {cmd}")
+                completed = subprocess.run(
+                    cmd,
+                    shell=True,
+                    check=True,
+                    cwd=os.path.dirname(__file__),
+                    timeout=30,
+                    capture_output=True,
+                    text=True
+                )
+            else:
+                print(f"Trying to run: {' '.join(cmd)}")
+                completed = subprocess.run(
+                    cmd,
+                    check=True,
+                    cwd=os.path.dirname(__file__),
+                    timeout=30,
+                    capture_output=True,
+                    text=True
+                )
             if completed.stdout:
                 print("Build script output:\n", completed.stdout)
             if completed.stderr:
@@ -209,11 +226,13 @@ def run_image_check(image_name: str) -> None:
             continue
     
     # If we get here, all attempts failed
-    print("\n❌ Failed to run image check script with any available bash interpreter.")
+    print("\n❌ Failed to run image check script with any available interpreter.")
     print("Please ensure one of the following is available:")
-    print("  - Git Bash (recommended for Windows)")
+    print("  - zsh (default on macOS)")
+    print("  - bash")
+    print("  - sh")
+    print("  - Git Bash (for Windows)")
     print("  - WSL (Windows Subsystem for Linux)")
-    print("  - bash in your system PATH")
     print("\nAlternatively, you can run the image check manually:")
     print(f"  docker image inspect {image_name} || docker build -t {image_name} ../server")
     
