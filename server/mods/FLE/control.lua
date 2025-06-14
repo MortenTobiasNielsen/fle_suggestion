@@ -194,23 +194,27 @@ end
 remote.add_interface("FLE", {
     reset = function(num_characters)
         if not num_characters or num_characters < 1 and num_characters > 9 then
-            rcon.print(
-                "Invalid number of agents. Please specify a number between 1 and 9.")
+            return "Invalid number of agents. Please specify a number between 1 and 9."
         end
 
-        rcon.print(reset_scenario(num_characters))
+        return reset_scenario(num_characters)
     end,
     state_data = function(character_id, radius)
-        rcon.print(state_data(character_id, radius))
+        local data = state_data(character_id, radius)
+        rcon.print(json.encode(data))
     end,
     meta_data = function(character_id, radius)
-        rcon.print(meta_data(character_id, radius))
+        local data = meta_data(character_id, radius)
+        rcon.print(json.encode(data))
     end,
     map_data = function(character_id, radius)
-        rcon.print(map_data(character_id, radius))
+        local data = map_data(character_id, radius)
+        rcon.print(json.encode(data))
     end,
     add_actions = function(character_id, actions)
-        rcon.print(add_actions(character_id, actions))
+        return add_actions(character_id, actions)
     end,
-    execute_actions = function() rcon.print(execute_actions()) end
+    execute_actions = function() 
+        return execute_actions() 
+    end
 })

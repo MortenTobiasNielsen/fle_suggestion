@@ -17,9 +17,9 @@ for n, c in pairs(defines.direction) do direction_names[c] = n end
 function state_data(character_id, radius)
     local characters = global.fle.characters
     if not characters or #characters == 0 then
-        return json.encode({
+        return {
             Developer_Error = "No characters initialized. Please use /c remote.call('AICommands', 'reset', 1) to initialize."
-        })
+        }
     end
 
     local character = global.fle.characters[character_id]
@@ -88,7 +88,7 @@ function state_data(character_id, radius)
                     guns = gun_stats,
                     ammo = ammo_stats
                 },
-                walking_state =character.walking_state.walking,
+                walking_state = character.walking_state.walking,
                 mining = {
                     speed = prototype.mining_speed * 1 +
                         character.character_mining_speed_modifier,
@@ -145,9 +145,9 @@ function state_data(character_id, radius)
 
             local record = {
                 name = building.name,
-                position = {x = building.position.x, y = building.position.y},
-                selection_box = selection_box,
-                status = status,
+                position = building.position,
+                selection_box = building.selection_box,
+                status = building.status,
                 direction = direction
             }
 
@@ -383,7 +383,7 @@ function state_data(character_id, radius)
         end
     end
 
-    return json.encode(state)
+    return state
 end
 
 return state_data
