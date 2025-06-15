@@ -106,7 +106,6 @@ class StepParser:
     def parse(self):
         if os.path.exists(self.path):
             with open(self.path, "r", encoding="utf-8") as steps_file:
-                processed = 0
                 for line in steps_file:
                     line = line.strip()
 
@@ -121,7 +120,7 @@ class StepParser:
                         if type == "walk":
                             position, remaining = self._find_between_curly_bracers(remaining)
 
-                            result = self.communication_handler.walk(position)
+                            self.communication_handler.walk(position)
 
                         elif type == "build":
                             position, remaining = self._find_between_curly_bracers(remaining)
@@ -136,13 +135,13 @@ class StepParser:
                             elif direction_definition == "west":
                                 direction = Direction.WEST
 
-                            result = self.communication_handler.build(position, name, direction)
+                            self.communication_handler.build(position, name, direction)
 
                         elif type == "recipe":
                             position, remaining = self._find_between_curly_bracers(remaining)
                             name, remaining = self._find_between_quotes(remaining)
 
-                            result = self.communication_handler.recipe(position, name)
+                            self.communication_handler.recipe(position, name)
 
                         elif type == "put":
                             position, remaining = self._find_between_curly_bracers(remaining)
@@ -157,7 +156,7 @@ class StepParser:
                             elif inventory_definition == "chest": 
                                 inventory = InventoryType.CHEST
 
-                            result = self.communication_handler.put(position, name, quantity, inventory)
+                            self.communication_handler.put(position, name, quantity, inventory)
 
                         elif type == "take":
                             position, remaining = self._find_between_curly_bracers(remaining)
@@ -172,7 +171,7 @@ class StepParser:
                             elif inventory_definition == "chest": 
                                 inventory = InventoryType.CHEST
 
-                            result = self.communication_handler.take(position, name, quantity, inventory)
+                            self.communication_handler.take(position, name, quantity, inventory)
 
                         elif type == "rotate":
                             position, remaining = self._find_between_curly_bracers(remaining)
@@ -182,36 +181,35 @@ class StepParser:
                             if reverse_str == "true":
                                 reverse = True
 
-                            result = self.communication_handler.rotate(position, reverse)
+                            self.communication_handler.rotate(position, reverse)
 
                         elif type == "idle":
                             ticks = self._find_last(remaining)
                             ticks = int(ticks)
 
-                            result = self.communication_handler.wait(ticks)
+                            self.communication_handler.wait(ticks)
 
                         elif type == "mine":
                             position, remaining = self._find_between_curly_bracers(remaining)
                             ticks = self._find_last(remaining)
                             ticks = int(ticks)
 
-                            result = self.communication_handler.mine(position, ticks)
+                            self.communication_handler.mine(position, ticks)
 
                         elif type == "craft":
                             quantity, remaining = self._find_between_commas(remaining)
                             quantity = int(quantity)
                             name, remaining = self._find_between_quotes(remaining)
 
-                            result = self.communication_handler.craft(name, quantity)
+                            self.communication_handler.craft(name, quantity)
                         elif type == "tech":
                             name, remaining = self._find_between_quotes(remaining)
 
-                            result = self.communication_handler.research(name)
+                            self.communication_handler.research(name)
 
                         else:
-                            test = 1
-
-                self.communication_handler.send_actions()
+                            # TODO: Implement other step types
+                            do_nothing = True
         else:
             return "Path doesn't exist."
         

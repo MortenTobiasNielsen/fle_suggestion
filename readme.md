@@ -30,22 +30,24 @@ Contains the .NET 9 REST API project that provides structured access to Factorio
 
 - **Program.cs**: Main API application with endpoint definitions and OpenAPI configuration
 - **Models/**: C# data models for game entities (MetaData, StateData, MapData, etc.)
-- **Services/**: Communication handlers for RCON integration
+- **Services/**: Communication handlers and action processing
 - **API.csproj**: Project configuration with AOT compilation enabled
 
 ### API Endpoints
 - `GET /data/meta/{agentId}` - Game metadata (items, recipes, technologies)
 - `GET /data/state/{agentId}` - Current game state (agents, buildings, research)
 - `GET /data/map/{agentId}` - Map information (tiles, offshore pump locations)
+- `POST /actions` - Process game actions for multiple agents
+- `POST /actions/execute` - Execute the queued up actions
 - `GET /scalar/v1` - Interactive API documentation (Scalar UI)
 - `GET /openapi/v1.json` - OpenAPI specification
 
 ## integration/
-Contains Python scripts and logic for integrating with the Factorio game, managing communication, automation, and scenario steps. Now uses the REST API for data retrieval and RCON for commands.
+Contains Python scripts and logic for integrating with the Factorio game, managing communication, automation, and scenario steps. Uses the REST API for both data retrieval and action processing.
 
-- **main.py**: Main integration script with hybrid API/RCON communication
+- **main.py**: Main integration script with REST API communication
 - **docker_manager.py**: Handles Docker image management
-- **communication_handler.py**: Manages RCON communication for actions
+- **communication_handler.py**: Manages communication with the API
 - **models/**: Data models used by the integration scripts
 - **step_parser.py**: Parser for Factorio TAS Generator steps
 - **steps_lab.lua**: Sample TAS Generator steps file for testing
@@ -87,7 +89,7 @@ Contains all files related to running the Factorio server, including scenarios, 
 The script will automatically:
 - Build the Docker image (Factorio server + API)
 - Start the container with both services
-- Wait for RCON and API to be ready
+- Wait for the API to be ready
 - Execute the demo scenario
 - Retrieve data via the REST API
 
@@ -99,6 +101,38 @@ Once running, you can access:
   - `http://localhost:5000/data/meta/1`
   - `http://localhost:5000/data/state/1`  
   - `http://localhost:5000/data/map/1`
+- **Actions**: `POST http://localhost:5000/data/actions` (send JSON with agent actions)
+
+#### Actions Endpoint Example
+The actions endpoint accepts a JSON payload with multiple agents and their respective actions:
+
+```json
+{
+  "agent_actions": [
+    {
+      "agent_id": 1,
+      "actions": [
+        {
+          "type": "walk",
+          "position": { "x": 10, "y": 5 }
+        },
+        {
+          "type": "mine",
+          "position": { "x": 10, "y": 5 },
+          "ticks": 60
+        },
+        {
+          "type": "craft",
+          "item_name": "iron-plate",
+          "quantity": 5
+        }
+      ]
+    }
+  ]
+}
+```
+
+Supported action types: `walk`, `mine`, `craft`, `cancel_craft`, `build`, `rotate`, `take`, `put`, `research`, `cancel_research`, `recipe`, `wait`, `drop`, `launch_rocket`, `pick_up`.
 
 ### Development
 1. **Copy FLE mod** to your Factorio installation (if you want to connect to the server):

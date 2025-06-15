@@ -80,44 +80,11 @@ public class CraftingQueueItem
 public class ActionHistory
 {
     [JsonPropertyName("past_actions")]
-    public List<GameAction> PastActions { get; set; } = [];
+    public List<AgentAction> PastActions { get; set; } = [];
 
     [JsonPropertyName("current_action")]
-    public GameAction? CurrentAction { get; set; }
+    public AgentAction? CurrentAction { get; set; }
 
     [JsonPropertyName("future_actions")]
-    public List<GameAction> FutureActions { get; set; } = [];
-}
-
-public class GameAction
-{
-    [JsonPropertyName("type")]
-    public string Type { get; set; } = string.Empty;
-
-    [JsonPropertyName("position")]
-    public Position? Position { get; set; }
-
-    [JsonPropertyName("destination")]
-    public Position? Destination { get; set; }
-
-    [JsonPropertyName("technology_name")]
-    public string? TechnologyName { get; set; }
-
-    [JsonPropertyName("item_name")]
-    public string? ItemName { get; set; }
-
-    [JsonPropertyName("recipe_name")]
-    public string? RecipeName { get; set; }
-
-    [JsonPropertyName("direction")]
-    public int? Direction { get; set; }
-
-    [JsonPropertyName("quantity")]
-    public int? Quantity { get; set; }
-
-    [JsonPropertyName("inventory_type")]
-    public int? InventoryType { get; set; }
-
-    [JsonPropertyName("reverse")]
-    public bool? Reverse { get; set; }
+    public List<AgentAction> FutureActions { get; set; } = [];
 }

@@ -1,5 +1,4 @@
 import os
-import socket
 import subprocess
 import json
 import time
@@ -7,7 +6,6 @@ from typing import List, Dict, Any
 import docker
 from docker.client import DockerClient
 from docker.models.containers import Container
-from factorio_rcon import RCONClient
 import requests
 
 from communication_handler import CommunicationHandler, DataType
@@ -16,121 +14,35 @@ from models.position import Position
 from step_parser import StepParser
 from docker_manager import ensure_docker_running
 
-class FleApiClient:
-    """Client for accessing the Factorio Learning Environment API."""
-    
-    def __init__(self, base_url: str, timeout: int = 30):
-        self.base_url = base_url.rstrip('/')
-        self.timeout = timeout
-        self.session = requests.Session()
-    
-    def get_meta_data(self, agent_id: int) -> Dict[str, Any]:
-        """Get meta data for the specified agent."""
-        response = self.session.get(
-            f"{self.base_url}/data/meta/{agent_id}",
-            timeout=self.timeout
-        )
-        response.raise_for_status()
-        return response.json()
-    
-    def get_state_data(self, agent_id: int) -> Dict[str, Any]:
-        """Get state data for the specified agent."""
-        response = self.session.get(
-            f"{self.base_url}/data/state/{agent_id}",
-            timeout=self.timeout
-        )
-        response.raise_for_status()
-        return response.json()
-    
-    def get_map_data(self, agent_id: int) -> Dict[str, Any]:
-        """Get map data for the specified agent."""
-        response = self.session.get(
-            f"{self.base_url}/data/map/{agent_id}",
-            timeout=self.timeout
-        )
-        response.raise_for_status()
-        return response.json()
-    
-    def wait_for_api_ready(self, max_attempts: int = 30, delay: float = 1.0) -> bool:
-        """Wait for the API to become available."""
-        for attempt in range(max_attempts):
-            try:
-                response = self.session.get(f"{self.base_url}/openapi/v1.json", timeout=5)
-                if response.status_code == 200:
-                    return True
-            except (requests.ConnectionError, requests.Timeout):
-                pass
-            
-            if attempt < max_attempts - 1:
-                time.sleep(delay)
-        
-        return False
-
-def wait_for_rcon(host: str, port: int, password: str = "factorio", timeout: float = 30.0) -> bool:
-    """
-    Try to connect and authenticate to RCON every few seconds until timeout seconds elapse.
-    Returns True if RCON authentication succeeded within timeout, False otherwise.
-    """
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        try:
-            # Try to create an RCON client and authenticate
-            rcon_client = RCONClient(host, port, password)
-            # Test with a simple command to verify RCON is working
-            rcon_client.send_command("/time")
-            return True
-        except (ConnectionRefusedError, socket.timeout, OSError):
-            # Connection refused or timeout - RCON not ready yet
-            time.sleep(1.0)
-        except Exception as e:
-            # Any other error (authentication, protocol, etc.) - RCON not ready yet
-            print(f"RCON not ready yet: {e}")
-            time.sleep(1.0)
-
-    return False  # timed out
-
-def wait_for_services(container: Container) -> tuple[str, int, str]:
-    """Wait for both RCON and API services to be available for a container."""
+def wait_for_services(container: Container) -> str:
+    """Wait for API service to be available for a container."""
     container.reload()  # ensure information is fresh
     ports_dict = container.attrs["NetworkSettings"]["Ports"]
-    
-    # Get RCON port mapping
-    rcon_mapping = ports_dict.get("27015/tcp")
-    if not rcon_mapping:
-        raise ValueError(f"Container {container.name} has no 27015/tcp port mapping!")
     
     # Get API port mapping
     api_mapping = ports_dict.get("5000/tcp")
     if not api_mapping:
         raise ValueError(f"Container {container.name} has no 5000/tcp port mapping!")
     
-    # Extract host and ports
-    host_ip = rcon_mapping[0]["HostIp"]
+    # Extract host and port
+    host_ip = api_mapping[0]["HostIp"]
     if host_ip == "0.0.0.0":
         host_ip = "127.0.0.1"
     
-    rcon_port = int(rcon_mapping[0]["HostPort"])
     api_port = int(api_mapping[0]["HostPort"])
     api_url = f"http://{host_ip}:{api_port}"
     
-    print(f"Waiting for services on {container.name}:")
-    print(f"  - RCON: {host_ip}:{rcon_port}")
+    print(f"Waiting for API service on {container.name}:")
     print(f"  - API: {api_url}")
     
-    # Wait for RCON
-    if wait_for_rcon(host=host_ip, port=rcon_port, password="factorio", timeout=30.0):
-        print(f"✅ RCON is ready")
-    else:
-        raise RuntimeError(f"❌ RCON timeout for {container.name}")
-    
     # Wait for API
-    api_client = FleApiClient(api_url)
-    if api_client.wait_for_api_ready(max_attempts=30, delay=1.0):
+    communication_handler = CommunicationHandler(api_url, 1)
+    if communication_handler.wait_for_api_ready(max_attempts=30, delay=1.0):
         print(f"✅ API is ready")
     else:
         raise RuntimeError(f"❌ API timeout for {container.name}")
     
-    return host_ip, rcon_port, api_url
+    return api_url
 
 def create_factorio_instance(
     docker_client: DockerClient,
@@ -369,47 +281,46 @@ if __name__ == "__main__":
         instance_count= INSTANCE_COUNT, 
         first_udp_port = 34197,
         first_rcon_port = 27015,
+        first_api_port = 5000,
     )
 
-    # Wait for both RCON and API services to be ready
-    host_ip, rcon_port, api_url = wait_for_services(container=containers[0])
+    # Wait for API service to be ready
+    api_url = wait_for_services(container=containers[0])
 
     try:
-        # Setup RCON client for commands and actions
-        rcon_client = RCONClient(host_ip, rcon_port, "factorio")
-        communication_handler = CommunicationHandler(rcon_client, 1)
-        
-        # Setup API client for data retrieval
-        api_client = FleApiClient(api_url)
+        # Setup API-based communication handler for agent 1
+        communication_handler = CommunicationHandler(api_url, 1)
 
         # Initialize the game
-        reset_response = rcon_client.send_command('/sc remote.call("FLE", "reset", 1)')
-        setup_game_items(communication_handler)
-        
-        # Parse and execute steps
-        steps_path = os.path.join(os.path.dirname(__file__), "steps_lab.lua")
-        step_parser = StepParser(steps_path, communication_handler)
-        step_parser.parse()
+        print("Resetting game state via API...")
+        reset_response = communication_handler.reset(agent_count=1)
+        print(f"Reset response: {reset_response}")
 
         # Get initial game data via API
         print("Fetching initial game data via API...")
-        meta_data = api_client.get_meta_data(agent_id=1)
-        map_data = api_client.get_map_data(agent_id=1)
-        state_data = api_client.get_state_data(agent_id=1)
+        meta_data = communication_handler.get_data(DataType.META)
+        map_data = communication_handler.get_data(DataType.MAP)
+        state_data = communication_handler.get_data(DataType.STATE)
 
-        # Execute actions via RCON
-        execute_actions_response = rcon_client.send_command('/sc remote.call("FLE", "execute_actions")')
-        print("Waiting 20 seconds for actions to be executed...")
-        time.sleep(20)  # Wait for actions to be executed
+        setup_game_items(communication_handler)
+        # Parse and queue additional steps
+        steps_path = os.path.join(os.path.dirname(__file__), "steps_lab.lua")
+        step_parser = StepParser(steps_path, communication_handler)
+        step_parser.parse()
+        
+        # Send parsed actions via API
+        print("Sending parsed actions via API...")
+        parsed_actions_response = communication_handler.send_actions()
+        print(f"Parsed actions sent: {parsed_actions_response}")
+
+        # Execute all queued actions
+        print("Executing all queued actions...")
+        execute_response = communication_handler.execute_actions()
+        print(f"Actions executed: {execute_response}")
 
         # Get final state data via API
         print("Fetching final game state via API...")
-        final_state_data = api_client.get_state_data(agent_id=1)
-
-        # meta = json.loads(meta_data)
-        # game_map = json.loads(map_data)
-        # state = json.loads(state_data)
-        # final_state = json.loads(final_state_data)
+        final_state_data = communication_handler.get_data(DataType.STATE)
 
         print("Game session completed successfully.") # Put a breakpoint here to inspect the data
         
