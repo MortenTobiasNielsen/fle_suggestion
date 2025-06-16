@@ -14,4 +14,17 @@
     <PackageReference Include="Scalar.AspNetCore" Version="1.2.42" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="API.Enums" />
+    <Using Include="API.Models" />
+    <Using Include="API.Converters" />
+    <Using Include="API.Services" />
+    <Using Include="API.Mappers" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
+
 </Project>

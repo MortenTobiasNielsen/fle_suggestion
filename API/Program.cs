@@ -1,9 +1,4 @@
-using System.Text.Json.Serialization;
-using API.Services;
-using API.Models;
-using System.Text.Json;
 using Scalar.AspNetCore;
-using Microsoft.Extensions.Logging;
 
 namespace API;
 

@@ -1,7 +1,4 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-namespace API.Models;
+namespace API.Converters;
 
 public class DirectionJsonConverter : JsonConverter<Direction>
 {
@@ -19,7 +16,7 @@ public class DirectionJsonConverter : JsonConverter<Direction>
         else if (reader.TokenType == JsonTokenType.String)
         {
             var stringValue = reader.GetString();
-            return DirectionExtensions.FromString(stringValue!);
+            return stringValue!.ToDirection();
         }
         throw new JsonException($"Cannot convert {reader.TokenType} to Direction");
     }
@@ -72,7 +69,7 @@ public class InventoryTypeJsonConverter : JsonConverter<InventoryType>
         else if (reader.TokenType == JsonTokenType.String)
         {
             var stringValue = reader.GetString();
-            return InventoryTypeExtensions.FromString(stringValue!);
+            return stringValue!.ToInventoryType();
         }
         throw new JsonException($"Cannot convert {reader.TokenType} to InventoryType");
     }

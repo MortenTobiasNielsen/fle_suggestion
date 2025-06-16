@@ -1,20 +1,8 @@
-namespace API.Models;
+namespace API.Mappers;
 
-public enum Direction
+public static class DirectionTypeMapper
 {
-    North = 0,           // defines.direction.north
-    Northeast = 1,       // defines.direction.northeast  
-    East = 2,            // defines.direction.east
-    Southeast = 3,       // defines.direction.southeast
-    South = 4,           // defines.direction.south
-    Southwest = 5,       // defines.direction.southwest
-    West = 6,            // defines.direction.west
-    Northwest = 7        // defines.direction.northwest
-}
-
-public static class DirectionExtensions
-{
-    public static string GetFactorioValue(this Direction direction) => direction switch
+    public static string ToFactorioString(this Direction direction) => direction switch
     {
         Direction.North => "defines.direction.north",
         Direction.Northeast => "defines.direction.northeast",
@@ -40,7 +28,7 @@ public static class DirectionExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(direction))
     };
 
-    public static Direction FromString(string value) => value?.ToLowerInvariant() switch
+    public static Direction ToDirection(this string value) => value?.ToLowerInvariant() switch
     {
         "north" => Direction.North,
         "northeast" => Direction.Northeast,

@@ -1,8 +1,6 @@
-using API.Models;
 using CoreRCON;
 using System.Text;
 using System.Net;
-using System.Text.Json;
 
 namespace API.Services;
 
@@ -50,7 +48,7 @@ public class CommunicationHandler : ICommunicationHandler, IDisposable
     {
         await EnsureConnectedAsync();
         
-        var command = $"/sc remote.call(\"FLE\", \"{dataType.GetValue()}\", {agentId}, {radiusToSearch})";
+        var command = $"/sc remote.call(\"FLE\", \"{dataType.ToFactorioString()}\", {agentId}, {radiusToSearch})";
         return await _client.SendCommandAsync(command);
     }
 

@@ -1,5 +1,3 @@
-using API.Models;
-
 namespace API.Services;
 
 public class ActionProcessor : IActionProcessor
@@ -83,7 +81,7 @@ public class ActionProcessor : IActionProcessor
             !action.Quantity.HasValue || !action.InventoryType.HasValue)
             return null;
 
-        return $"{{type = \"take\", position = {action.Position}, item_name = \"{action.ItemName}\", quantity = {action.Quantity.Value}, inventory_type = {action.InventoryType.Value.GetFactorioValue()}}}";
+        return $"{{type = \"take\", position = {action.Position}, item_name = \"{action.ItemName}\", quantity = {action.Quantity.Value}, inventory_type = {action.InventoryType.Value.ToFactorioString()}}}";
     }
 
     private static string? Put(AgentAction action)
@@ -92,7 +90,7 @@ public class ActionProcessor : IActionProcessor
             !action.Quantity.HasValue || !action.InventoryType.HasValue)
             return null;
 
-        return $"{{type = \"put\", position = {action.Position}, item_name = \"{action.ItemName}\", quantity = {action.Quantity.Value}, inventory_type = {action.InventoryType.Value.GetFactorioValue()}}}";
+        return $"{{type = \"put\", position = {action.Position}, item_name = \"{action.ItemName}\", quantity = {action.Quantity.Value}, inventory_type = {action.InventoryType.Value.ToFactorioString()}}}";
     }
 
     private static string? Craft(AgentAction action)
@@ -117,7 +115,7 @@ public class ActionProcessor : IActionProcessor
             !action.Direction.HasValue)
             return null;
 
-        return $"{{type = \"build\", position = {action.Position}, item_name = \"{action.ItemName}\", direction = {action.Direction.Value.GetFactorioValue()}}}";
+        return $"{{type = \"build\", position = {action.Position}, item_name = \"{action.ItemName}\", direction = {action.Direction.Value.ToFactorioString()}}}";
     }
 
     private static string? Rotate(AgentAction action)
